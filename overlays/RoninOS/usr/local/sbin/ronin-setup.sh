@@ -9,16 +9,16 @@ regenerate_passwords_and_update_info_file(){
 
     # Change the root user's password.
     echo "Changing the root user's password..."
-    sudo chpasswd <<<"root:$rootpwd"
+    sudo chpasswd <<<"root:root"
 
     # Change the ronindojo user's password.
     echo "Changing the ronindojo user's password..."
-    sudo chpasswd <<<"$USER:$roninpwd"
+    sudo chpasswd <<<"$USER:ronindojo"
 
     # remove old info.json then create new with new passwords.
     rm -rf /home/ronindojo/.config/RoninDojo/info.json
     cat <<EOF >/home/"${USER}"/.config/RoninDojo/info.json
-{"user":[{"name":"${USER}","password":"${roninpwd}"},{"name":"root","password":"${rootpwd}"}]}
+{"user":[{"name":"${USER}","password":"ronindojo"},{"name":"root","password":"root"}]}
 EOF
 
     # add validation for that the setup was done.

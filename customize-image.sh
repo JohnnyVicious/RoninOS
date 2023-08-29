@@ -26,7 +26,7 @@ KEYMAP="us"
 _create_oem_install() {
     pam-auth-update --package	
     # Setting root password
-    chpasswd <<<"root:$ROOTPASSWORD"
+    chpasswd <<<"root:root"
 
     # Adding user $USER
     useradd -m -G wheel,sys,audio,input,video,storage,lp,network,users,power -s /bin/bash "$USER" &>/dev/null
@@ -39,12 +39,12 @@ _create_oem_install() {
     chfn -f "$FULLNAME" "$USER" &>/dev/null
 
     # Setting password for $USER
-    chpasswd <<<"$USER:$PASSWORD"
+    chpasswd <<<"$USER:ronindojo"
 
     # Save Linux user credentials for UI access
     mkdir -p /home/"${USER}"/.config/RoninDojo
     cat <<EOF >/home/"${USER}"/.config/RoninDojo/info.json
-{"user":[{"name":"${USER}","password":"${PASSWORD}"},{"name":"root","password":"${ROOTPASSWORD}"}]}
+{"user":[{"name":"${USER}","password":"ronindojo"},{"name":"root","password":"root"}]}
 EOF
     chown -R "${USER}":"${USER}" /home/"${USER}"/.config
 
