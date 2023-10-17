@@ -1,0 +1,1 @@
+chmod 755 ~/RoninOS/01-stage-ronin-os.sh

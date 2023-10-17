@@ -67,5 +67,5 @@ chmod 664 ~/RoninOS/01-stage-ronin-os.sh
 echo " "
 echo -e "${CLGREEN}Note:${CDEF} This script is now set to be ${CGREEN}not executable${CDEF} (644) any more –"\
       "to not have you in the situation to accidentally mess up your staged files."\
-      "However, should you be willing to use it again, simply command [${CGREEN} chmod 755 ${FILENAME} ${CDEF}] first."
+      "However, should you be willing to use it again, simply command [${CGREEN} chmod 755 ${FILENAME} ${CDEF}] or execute [${CGREEN} 00-enable-staging.sh ${CDEF}] first."
 
