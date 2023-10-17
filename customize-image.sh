@@ -298,8 +298,14 @@ HiddenServicePort 80 127.0.0.1:8470\
 
 
 # If RoninOS image needs to be compiled with a static IP preset, then make your edits here
-# Adapted from: wiki.ronindojo.io/en/extras/Setting-Static-IP
 # Uncomment _prep_staticip() function in main() to make use of this
+#
+# Adapted from: wiki.ronindojo.io/en/extras/Setting-Static-IP
+# Use 'ip route' on your target system to find out the exact name of the network adapter
+#
+# Quick tip what the correct network adapter name might be:
+# arm64: /etc/systemd/network/eth0.network, Name=eth0
+#   x86: /etc/systemd/network/eno1.network, Name=eno1
 _prep_staticip(){
 
     echo -e "Preparing for local IP to be [${CGREEN} static ${CDEF}]"
