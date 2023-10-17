@@ -1,0 +1,17 @@
+Changelog
+
+RoninOS v2.1.1 Change log
+
+- Reliably setting hostname of target system (via Armbian compiler parameter)
+- Reliably setting timezone for target system
+- Reliably setting keyboard layout for target system
+- Preparation for generating additional locale on demand
+- Clean-up of legacy code bits
+- Using recommended method to copy RoninDojo to target system (from /tmp/overlay/)
+- Added Midnight Commander and Glances to be installed on target system
+- Added on-demand static IP feature
+- Added some eye candy during the build process
+- Complete overhaul of README.md to make it even more "maker friendly"
+- Introducing new method for image compiling via easy and controllable .sh scripts
+
+- Credits: dammkewl, BTCxZelko, s2l1, Numbers, KYC3, WittyBull, Lasermind
