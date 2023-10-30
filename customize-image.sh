@@ -87,6 +87,9 @@ EOF
     sed -i -e "s/PermitRootLogin yes/#PermitRootLogin prohibit-password/" \
         -e "s/PermitEmptyPasswords yes/#PermitEmptyPasswords no/" /etc/ssh/sshd_config
 
+    # Set sudo timeout to 1 hour
+    sed -i '/env_reset/a Defaults\ttimestamp_timeout=60' /etc/sudoers
+
     # Enable passwordless sudo
     sed -i '/ronindojo/s/ALL) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers # change to no password
 
