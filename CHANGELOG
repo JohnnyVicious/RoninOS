@@ -1,6 +1,6 @@
 Changelog
 
-RoninOS vRELEASEVERSIONPENDING Change log
+RoninOS v2.1.1 Change log
 - Increased sudo timeout to 1 hour
 - Simplified customize-image.sh image build script
 - Reverted portion of refactoring that was necessary to remove the NOPASSWD property on the ronindojo user after initial boot installation procedure completes
