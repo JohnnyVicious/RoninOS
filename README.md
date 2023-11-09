@@ -4,9 +4,11 @@
 2) run `git clone --depth=1 --branch=main https://github.com/armbian/build`
 3) Clone this repo with `git clone https://code.samourai.io/ronindojo/RoninOS.git`
 4) run `mkdir -p build/userpatches/overlay/`
+TODO: copy the lib.config file here to build/userpatches
 5) run `cp -Rv RoninOS/customize-image.sh build/userpatches/customize-image.sh && cp -Rv RoninOS build/userpatches/overlay/`
 6) change the working directory to the root of the build project with `cd build`
 7) Start armbian build process by running the command `./compile.sh BOARD=rockpro64 BRANCH=current BUILD_DESKTOP=no BUILD_MINIMAL=yes KERNEL_CONFIGURE=no RELEASE=bullseye`
+TODO: add the BSPFREEZE parameter to this compile.sh call
 8) Let it run and relax. (Takes 45-90 min)
 9) You can find the image files in the directory `output` that's in the root of the build project
 
