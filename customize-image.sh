@@ -128,7 +128,10 @@ _service_checks(){
 # Installs Nodejs, docker, docker-compose, and pm2. Clones the RoninDojo repo. This is needed due to some out dated packages in the default debian package manager.
 _prep_install(){
     # install Nodejs
-    curl -sL https://deb.nodesource.com/setup_16.x | bash -
+    apt-get install -y ca-certificates curl gnupg
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+    NODE_MAJOR=20
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
     apt-get update
     apt-get install -y nodejs
 
@@ -143,7 +146,7 @@ _prep_install(){
     apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
     # install docker-compose
-    curl -L https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-aarch64 -o /usr/bin/docker-compose
+    curl -L https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-aarch64 -o /usr/bin/docker-compose
     chmod +x /usr/bin/docker-compose
 
     # install pm2 
@@ -197,7 +200,7 @@ _install_ronin_ui(){
 
     cd /home/ronindojo || exit
 
-    npm i -g pnpm@7 &>/dev/null
+    npm i -g pnpm &>/dev/null
 
     #sudo npm install pm2 -g
 
@@ -257,7 +260,7 @@ HiddenServicePort 80 127.0.0.1:8470\
 main(){
     # install dependencies
     apt-get update
-    apt-get install -y man-db git avahi-daemon nginx openjdk-11-jdk fail2ban net-tools htop unzip wget ufw rsync jq python3 python3-pip pipenv gdisk gcc curl apparmor ca-certificates gnupg lsb-release
+    apt-get install -y man-db git avahi-daemon nginx openjdk-11-jdk fail2ban net-tools htop unzip wget ufw rsync jq python3 python3-pip pipenv gdisk gcc curl apparmor ca-certificates gnupg lsb-release nvme-cli 
     apt-get install -y tor/bullseye-backports #install 0.4.7.x tor
     # clone the original RoninOS
     git clone https://code.samourai.io/ronindojo/RoninOS.git /tmp/RoninOS
