@@ -1,3 +1,9 @@
+# place this file in an empty directory
+# run "chmod +x reset.branch.sh"
+# place the armbian image in the same directory (name must start with "Armbian_23")
+# run "./reset.branch.sh"
+# your image file is now edited
+
 set -ex
 sectorsize=$(fdisk -l Armbian_23* | head -n 2 | tail -n 1 | awk '{print $8}')
 startsector=$(fdisk -l Armbian_23* | tail -n 1 | awk '{print $2}')
