@@ -5,11 +5,13 @@
 # your image file is now edited
 
 set -ex
-sectorsize=$(fdisk -l Armbian* | head -n 2 | tail -n 1 | awk '{print $8}')
-startsector=$(fdisk -l Armbian* | tail -n 1 | awk '{print $2}')
+sudo echo "starting"
+sectorsize=$(sudo fdisk -l Armbian* | head -n 2 | tail -n 1 | awk '{print $8}')
+startsector=$(sudo fdisk -l Armbian* | tail -n 1 | awk '{print $2}')
 startbyte=$(($sectorsize*$startsector))
 mkdir ronin_temp_mount
-mount -o loop,offset=$startbyte Armbian* ./ronin_temp_mount
-sed -i 's|^.*git clone.*$|git clone -b master https://code.samourai.io/ronindojo/RoninDojo /home/ronindojo/RoninDojo|' ronin_temp_mount/usr/local/sbin/ronin-setup.sh
+sudo mount -o loop,offset=$startbyte Armbian* ./ronin_temp_mount
+sudo sed -i 's|^.*git clone.*$|git clone -b master https://code.samourai.io/ronindojo/RoninDojo /home/ronindojo/RoninDojo|' ronin_temp_mount/usr/local/sbin/ronin-setup.sh
 umount ronin_temp_mount
 rmdir ronin_temp_mount
+echo "done"
