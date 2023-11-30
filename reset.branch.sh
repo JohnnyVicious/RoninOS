@@ -1,6 +1,6 @@
 # place this file in an empty directory
 # run "chmod +x reset.branch.sh"
-# place the armbian image in the same directory (name must start with "Armbian_23")
+# place the armbian image in the same directory (name must start with "Armbian")
 # run "./reset.branch.sh"
 # your image file is now edited
 
