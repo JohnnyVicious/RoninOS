@@ -60,5 +60,6 @@ if _main; then
         sudo systemctl start pm2-ronindojo.service
     fi
     sudo systemctl disable ronin-setup.service
+    sudo sed -i '/ronindojo/s/ALL) NOPASSWD:ALL/ALL) ALL/' /etc/sudoers
     touch /home/ronindojo/.logs/setup-complete
 fi

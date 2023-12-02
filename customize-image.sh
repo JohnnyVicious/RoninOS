@@ -87,11 +87,11 @@ EOF
     sed -i -e "s/PermitRootLogin yes/#PermitRootLogin prohibit-password/" \
         -e "s/PermitEmptyPasswords yes/#PermitEmptyPasswords no/" /etc/ssh/sshd_config
 
-    # Enable password less sudo
-    test -d /etc/sudoers.d || mkdir /etc/sudoers.d
-    echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ronindojo.override
+    # Set sudo timeout to 1 hour
+    sed -i '/env_reset/a Defaults\ttimestamp_timeout=60' /etc/sudoers
+
+    # Enable passwordless sudo
     sed -i '/ronindojo/s/ALL) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers # change to no password
-    
 
     echo -e "domain .local\nnameserver 1.1.1.1\nnameserver 1.0.0.1" >> /etc/resolv.conf
     
