@@ -38,7 +38,9 @@ Date and Time: $TIMESTAMP
 EOF
 fi
 
-# Check if pre-reqs for the ronin-setup.service are fulfilled
+[ ! -d /home/ronindojo/.logs ] && mkdir -p /home/ronindojo/.logs && touch /home/ronindojo/.logs/{setup.logs,pre-setup.logs,post.logs}
+
+# Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $USER password for troubleshooting and exit
 [ ! -f /home/"${USER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; chpasswd <<<"$USER:Ronindojo369"; exit)
 
 # Only enable the RoninDojo setup service after everything has been validated
