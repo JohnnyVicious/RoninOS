@@ -6,9 +6,9 @@ NEWHOSTNAME="RoninDojo"
 RONINUSER="ronindojo"
 
 # Generate random passwords for root and $RONINUSER
-#PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c'21')"
+#PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21 2>/dev/null)"
 PASSWORD="Ronindojo369"
-ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c'21')"
+ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21 2>/dev/null)"
 
 echo "Making sure the ronin-setup.service is disabled"
 systemctl is-enabled --quiet ronin-setup.service && systemctl disable --now ronin-setup.service
