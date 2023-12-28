@@ -33,7 +33,7 @@ EOF
     # add validation for that the setup was done.
     GENERATE_MESSAGE="Your password was randomly generated during System Setup."
     TIMESTAMP=$(date)
-    cat <<EOF >/home/"${USER}"/.logs/pass_gen_timestamp.txt
+    cat <<EOF >/home/"${RONINUSER}"/.logs/pass_gen_timestamp.txt
 $GENERATE_MESSAGE
 Date and Time: $TIMESTAMP
 EOF
@@ -42,7 +42,7 @@ fi
 [ ! -d /home/ronindojo/.logs ] && mkdir -p /home/ronindojo/.logs && touch /home/ronindojo/.logs/{setup.logs,pre-setup.logs,post.logs}
 
 echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $RONINUSER password for troubleshooting and exit"
-[ ! -f /home/"${USER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; chpasswd <<<"$RONINUSER:Ronindojo369"; exit 1;)
+[ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; chpasswd <<<"$RONINUSER:Ronindojo369"; exit 1;)
 
 echo "Enabling the RoninDojo setup service after everything has been validated"
 systemctl enable --now ronin-setup.service
