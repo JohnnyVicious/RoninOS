@@ -5,8 +5,6 @@ Wants=oem-boot.service network-online.target
 
 [Service]
 Type=simple
-User=root
-WorkingDirectory=/home/root
 ExecStart=/usr/local/sbin/ronin-pre.sh
 StandardOutput=journal+console
 StandardError=journal+console
