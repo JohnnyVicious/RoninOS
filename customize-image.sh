@@ -272,10 +272,19 @@ main(){
     # REPO= "https://code.samourai.io/ronindojo/RoninOS.git"
     REPO="-b fix_ambian_setup https://github.com/JohnnyVicious/RoninOS.git"
     
-    # install dependencies
     apt-get update
-    # apt-get install -y man-db git avahi-daemon nginx openjdk-11-jdk fail2ban net-tools htop unzip wget ufw rsync jq python3 python3-pip pipenv gdisk gcc curl apparmor ca-certificates gnupg lsb-release
+    
+    # Clean-up older packages
     apt-get autoremove -y
+    
+    # List of packages to install
+    packages=(
+        man-db git avahi-daemon nginx openjdk-11-jdk fail2ban
+        net-tools htop unzip wget ufw rsync jq python3 python3-pip
+        pipenv gdisk gcc curl apparmor ca-certificates gnupg parted lsb-release
+    )
+    
+    # Install packages    
     for pkg in "${packages[@]}"; do
         apt-get install -y "$pkg"	
     done
