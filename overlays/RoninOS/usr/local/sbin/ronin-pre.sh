@@ -13,6 +13,8 @@ ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21 2>/dev/null)"
 echo "Making sure the ronin-setup.service is disabled"
 systemctl is-enabled --quiet ronin-setup.service && systemctl disable --now ronin-setup.service
 
+[ -f /home/ronindojo/.logs/presetup-complete ] && echo "Pre-setup has already run, disabling service"; systemctl disable ronin-presetup.service; exit 0;
+
 echo "Set the hostname and reboot, since this service will be disabled after its run this should not create conflicts when the user changes the hostname"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Changing hostname to $NEWHOSTNAME"; hostnamectl set-hostname "$NEWHOSTNAME" #&& shutdown -r now
 [ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Hostname is still not $NEWHOSTNAME"; exit 1;
