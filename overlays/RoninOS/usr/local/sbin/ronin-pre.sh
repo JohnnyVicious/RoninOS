@@ -1,3 +1,4 @@
+# journal+console+file:/home/ronindojo/.logs/pre-setup.logs
 # Parameters
 NEWHOSTNAME="RoninDojo"
 RONINUSER="ronindojo"
