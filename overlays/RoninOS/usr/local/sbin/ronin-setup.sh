@@ -14,13 +14,12 @@ do
 done
 
 echo "Continue only if you can access the service user's home folder"
-cd "$HOME" || exit
+cd "$HOME" || exit 1;
 
-echo "Give time for Startup to finish before trying to update the repo"
-sleep 30s 
-
-echo "Clone Repo"
-git clone -b master https://code.samourai.io/ronindojo/RoninDojo /home/ronindojo/RoninDojo
+echo "Give time for Startup to finish before trying to clone the repo"
+sleep 30s
+REPO="-b master https://code.samourai.io/ronindojo/RoninDojo"
+[! -d /home/ronindojo/RoninDojo] && (echo "Cloning repo : $(echo $REPO)"; git clone "$(echo $REPO)" /home/ronindojo/RoninDojo)
 cd /home/ronindojo/RoninDojo
 
 # Source files for default values and generic functions
