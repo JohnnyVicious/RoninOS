@@ -2,7 +2,7 @@
 
 # This service will run as the $USER, passwordless sudo should have been set at this point
 
-[ -f /home/ronindojo/.logs/setup-complete ] && echo "Setup has already run, exiting..."; sudo systemctl disable ronin-setup.service; exit 0;
+[ -f /home/ronindojo/.logs/setup-complete ] && (echo "Setup has already run, exiting..."; sudo systemctl disable ronin-setup.service; exit 0;)
 
 while [ ! -f /home/ronindojo/.logs/presetup-complete ]
 do
