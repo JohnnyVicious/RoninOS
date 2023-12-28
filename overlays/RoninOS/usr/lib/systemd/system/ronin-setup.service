@@ -9,8 +9,8 @@ User=root
 WorkingDirectory=/home/root
 ExecStart=/usr/local/sbin/ronin-setup.sh
 ExecStop=/usr/local/sbin/ronin-teardown.sh
-StandardOutput=journal+console+file:/home/ronindojo/.logs/setup.logs
-StandardError=journal+console+file:/home/ronindojo/.logs/setup.logs
+StandardOutput=journal+console
+StandardError=journal+console
 
 [Install]
 WantedBy=multi-user.target
