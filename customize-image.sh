@@ -325,6 +325,7 @@ main(){
         rm -rf /etc/nginx/sites-enabled/default        
 	_install_ronin_ui
         usermod -aG docker ronindojo
+	chmod +x /usr/local/sbin/*.sh
         systemctl enable oem-boot.service # (does not work on Armbian build)
 	_service_checks # (does not work on Armbian build)
         echo "Setup is complete"
