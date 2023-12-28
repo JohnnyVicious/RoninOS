@@ -14,7 +14,7 @@ rm /root/.not_logged_in_yet
 
 # RoninDojo part
 TMPDIR=/var/tmp
-USER="ronindojo"
+RONINUSER="ronindojo"
 PASSWORD="Ronindojo369" # test purposes only
 ROOTPASSWORD="Ronindojo369" # test purposes only
 #PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21 2>/dev/null)"
@@ -22,7 +22,7 @@ ROOTPASSWORD="Ronindojo369" # test purposes only
 FULLNAME="RoninDojo"
 TIMEZONE="UTC"
 LOCALE="en_US.UTF-8"
-HOSTNAME="RoninDojo"
+NEWHOSTNAME="RoninDojo"
 KEYMAP="us"
 
 _create_oem_install() {
@@ -30,28 +30,28 @@ _create_oem_install() {
     # Setting root password    
     chpasswd <<<"root:$ROOTPASSWORD"
 
-    # Adding user $USER (split up to avoid non-exec in case of error, groups were invalid before so user didn't get added to any)
-    useradd -m -G users "$USER"
-    usermod -s /bin/bash "$USER"
-    for group in sys audio input video lp; do usermod -aG "$group" "$USER"; done
-    chown -R "${USER}":"${USER}" /home/"${USER}"
+    # Adding user $RONINUSER (split up to avoid non-exec in case of error, groups were invalid before so user didn't get added to any)
+    useradd -m -G users "$RONINUSER"
+    usermod -s /bin/bash "$RONINUSER"
+    for group in sys audio input video lp; do usermod -aG "$group" "$RONINUSER"; done
+    chown -R "${RONINUSER}":"${RONINUSER}" /home/"${RONINUSER}"
 
     # Set User and WorkingDirectory in ronin-setup.service unit file
-    sed -i -e "s/User=.*$/User=${USER}/" \
-        -e "s/WorkingDirectory=.*$/WorkingDirectory=\/home\/${USER}/" /usr/lib/systemd/system/ronin-setup.service
+    sed -i -e "s/User=.*$/User=${RONINUSER}/" \
+        -e "s/WorkingDirectory=.*$/WorkingDirectory=\/home\/${RONINUSER}/" /usr/lib/systemd/system/ronin-setup.service
 
     # Setting full name to $FULLNAME
-    chfn -f "$FULLNAME" "$USER" &>/dev/null
+    chfn -f "$FULLNAME" "$RONINUSER" &>/dev/null
 
-    # Setting password for $USER
-    chpasswd <<<"$USER:$PASSWORD"
+    # Setting password for $RONINUSER
+    chpasswd <<<"$RONINUSER:$PASSWORD"
 
     # Save Linux user credentials for UI access (does not work on Armbian build)
-    mkdir -p /home/"${USER}"/.config/RoninDojo
-    cat <<EOF >/home/"${USER}"/.config/RoninDojo/info.json
-{"user":[{"name":"${USER}","password":"${PASSWORD}"},{"name":"root","password":"${ROOTPASSWORD}"}]}
+    mkdir -p /home/"${RONINUSER}"/.config/RoninDojo
+    cat <<EOF >/home/"${RONINUSER}"/.config/RoninDojo/info.json
+{"user":[{"name":"${RONINUSER}","password":"${PASSWORD}"},{"name":"root","password":"${ROOTPASSWORD}"}]}
 EOF
-    chown -R "${USER}":"${USER}" /home/"${USER}"/.config
+    chown -R "${RONINUSER}":"${RONINUSER}" /home/"${RONINUSER}"/.config
 
     # Setting timezone to $TIMEZONE (does not work on Armbian build)
     timedatectl set-timezone $TIMEZONE &>/dev/null
@@ -70,8 +70,8 @@ EOF
         fi
     fi
 
-    # Setting hostname to $HOSTNAME (does not work on Armbian build)
-    hostnamectl hostname $HOSTNAME &>/dev/null
+    # Setting hostname to $NEWHOSTNAME (does not work on Armbian build)
+    hostnamectl set-hostname $NEWHOSTNAME &>/dev/null
 
     # Resizing partition (does not work on Armbian build)
     resize-fs &>/dev/null
@@ -268,7 +268,6 @@ HiddenServicePort 80 127.0.0.1:8470\
 
 # This installs all required packages needed for RoninDojo. Clones the RoninOS repo so it can be copied to appropriate locations. Then runs all the functions defined above.
 main(){
-    USER="ronindojo"
     # REPO= "https://code.samourai.io/ronindojo/RoninOS.git"
     REPO="-b fix_ambian_setup https://github.com/JohnnyVicious/RoninOS.git"
     
