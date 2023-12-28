@@ -1,12 +1,12 @@
 [Unit]
 Description=Setup RoninDojo
-After=avahi-daemon.service network-online.target
-Wants=oem-boot.service network-online.target
+After=avahi-daemon.service network-online.target ronin-pre.service
+Wants=oem-boot.service network-online.target ronin-pre.service
 
 [Service]
 Type=simple
-User=admin
-WorkingDirectory=/home/admin
+User=root
+WorkingDirectory=/home/root
 ExecStart=/usr/local/sbin/ronin-setup.sh
 ExecStop=/usr/local/sbin/ronin-teardown.sh
 StandardOutput=file:/home/ronindojo/.logs/setup.logs
