@@ -2,10 +2,17 @@
 
 # This service will run as the $USER, passwordless sudo should have been set at this point
 
+while [ ! -f /home/ronindojo/.logs/presetup-complete ]
+do
+   echo "waiting until pre-setup is complete..."
+   sleep 30s
+   if [ -f /home/ronindojo/.logs/presetup-complete ]; then
+      break
+   fi
+done
+
 echo "Continue only if you can access the service user's home folder"
 cd "$HOME" || exit
-
-# /home/ronindojo/.logs/presetup-complete
 
 echo "Give time for Startup to finish before trying to update the repo"
 sleep 30s 
