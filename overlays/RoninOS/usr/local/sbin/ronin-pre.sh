@@ -1,34 +1,34 @@
 # Parameters
 NEWHOSTNAME="RoninDojo"
-USER="ronindojo"
+RONINUSER="ronindojo"
 
-# Generate random passwords for root and $USER
+# Generate random passwords for root and $RONINUSER
 #PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c'21')"
 PASSWORD="Ronindojo369"
 ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c'21')"
 
-# Make sure the ronin-setup.service is disabled
+echo "Making sure the ronin-setup.service is disabled"
 systemctl is-enabled --quiet ronin-setup.service && systemctl disable --now ronin-setup.service
 
-# Set the hostname and reboot, since this service will be disabled after its run this should not create conflicts when the user changes the hostname
+echo "Set the hostname and reboot, since this service will be disabled after its run this should not create conflicts when the user changes the hostname"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Changing hostname to $NEWHOSTNAME"; hostnamectl set-hostname "$NEWHOSTNAME" && shutdown -r now
 
-echo "$(ls -l /home)" # DEBUG
+echo "$(ls -l /home)" # DEBUG ownership of home folder
 
-# Set the owner for the home folder, noticed this does not (always?) happen during the Armbian build
-chown -R "$USER":"$USER" /home/"$USER"
+echo "Set the owner for the home folder" # noticed this does not (always?) happen during the Armbian build
+chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
-# Enable passwordless sudo for $USER
-grep -q "${USER}.*NOPASSWD:ALL" /etc/sudoers || sed -i "/${USER}/s/ALL) ALL/ALL) NOPASSWD:ALL/" /etc/sudoers
+echo "Enable passwordless sudo for $RONINUSER"
+grep -q "${RONINUSER}.*NOPASSWD:ALL" /etc/sudoers || sed -i "/${RONINUSER}/s/ALL) ALL/ALL) NOPASSWD:ALL/" /etc/sudoers
 
-# Set and store the random passwords if config.json does not already exist
-if [ ! -f /home/"${USER}"/.config/RoninDojo/config.json ]; then
-    echo "Adding the random generated passwords to info.json"
-    mkdir -p /home/"${USER}"/.config/RoninDojo
+echo "Set and store the random passwords if config.json does not already exist"
+if [ ! -f /home/"${RONINUSER}"/.config/RoninDojo/config.json ]; then
+    echo "Adding the random generated passwords to info.json, $RONINUSER:$PASSWORD"
+    mkdir -p /home/"${RONINUSER}"/.config/RoninDojo
     chpasswd <<<"root:$ROOTPASSWORD"
-    chpasswd <<<"$USER:$PASSWORD"
-    cat <<EOF >/home/"${USER}"/.config/RoninDojo/info.json
-{"user":[{"name":"${USER}","password":"${PASSWORD}"},{"name":"root","password":"${ROOTPASSWORD}"}]}
+    chpasswd <<<"$RONINUSER:$PASSWORD"
+    cat <<EOF >/home/"${RONINUSER}"/.config/RoninDojo/info.json
+{"user":[{"name":"${RONINUSER}","password":"${PASSWORD}"},{"name":"root","password":"${ROOTPASSWORD}"}]}
 EOF
     # add validation for that the setup was done.
     GENERATE_MESSAGE="Your password was randomly generated during System Setup."
@@ -41,8 +41,8 @@ fi
 
 [ ! -d /home/ronindojo/.logs ] && mkdir -p /home/ronindojo/.logs && touch /home/ronindojo/.logs/{setup.logs,pre-setup.logs,post.logs}
 
-# Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $USER password for troubleshooting and exit
-[ ! -f /home/"${USER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; chpasswd <<<"$USER:Ronindojo369"; exit 1;)
+echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $RONINUSER password for troubleshooting and exit"
+[ ! -f /home/"${USER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; chpasswd <<<"$RONINUSER:Ronindojo369"; exit 1;)
 
-# Only enable the RoninDojo setup service after everything has been validated
+echo "Enabling the RoninDojo setup service after everything has been validated"
 systemctl enable --now ronin-setup.service
