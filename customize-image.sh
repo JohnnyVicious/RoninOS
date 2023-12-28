@@ -27,7 +27,7 @@ KEYMAP="us"
 
 _create_oem_install() {
     pam-auth-update --package	
-    # Setting root password
+    # Setting root password    
     chpasswd <<<"root:$ROOTPASSWORD"
 
     # Adding user $USER (split up to avoid non-exec in case of error, groups were invalid before so user didn't get added to any)
@@ -293,7 +293,7 @@ main(){
     
     # clone the original RoninOS
     
-    git clone "$REPO" /tmp/RoninOS
+    git clone $(echo "$REPO") /tmp/RoninOS
     # Changed: don't overwrite (Armbian build)
     cp -Rvn /tmp/RoninOS/overlays/RoninOS/usr/* /usr/
     cp -Rvn /tmp/RoninOS/overlays/RoninOS/etc/* /etc/
