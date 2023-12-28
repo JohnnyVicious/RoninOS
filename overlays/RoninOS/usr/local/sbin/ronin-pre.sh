@@ -3,14 +3,15 @@ NEWHOSTNAME="RoninDojo"
 USER="ronindojo"
 
 # Generate random passwords for root and $USER
-PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c'21')"
+#PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c'21')"
+PASSWORD="Ronindojo369"
 ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c'21')"
 
 # Make sure the ronin-setup.service is disabled
-systemctl is-enabled --quiet ronin-setup.service && sudo systemctl disable --now ronin-setup.service
+systemctl is-enabled --quiet ronin-setup.service && systemctl disable --now ronin-setup.service
 
 # Set the hostname and reboot, since this service will be disabled after its run this should not create conflicts when the user changes the hostname
-[ "$(hostname)" != "$NEWHOSTNAME" ] && sudo hostnamectl set-hostname "$NEWHOSTNAME" && sudo reboot
+[ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Changing hostname to $NEWHOSTNAME"; hostnamectl set-hostname "$NEWHOSTNAME" && shutdown -r now
 
 echo "$(ls -l /home)" # DEBUG
 
@@ -18,7 +19,7 @@ echo "$(ls -l /home)" # DEBUG
 chown -R "$USER":"$USER" /home/"$USER"
 
 # Enable passwordless sudo for $USER
-grep -q "${USER}.*NOPASSWD:ALL" /etc/sudoers || sudo sed -i "/${USER}/s/ALL) ALL/ALL) NOPASSWD:ALL/" /etc/sudoers
+grep -q "${USER}.*NOPASSWD:ALL" /etc/sudoers || sed -i "/${USER}/s/ALL) ALL/ALL) NOPASSWD:ALL/" /etc/sudoers
 
 # Set and store the random passwords if config.json does not already exist
 if [ ! -f /home/"${USER}"/.config/RoninDojo/config.json ]; then
