@@ -16,8 +16,8 @@ systemctl is-enabled --quiet ronin-setup.service && systemctl disable --now roni
 [ -f /home/ronindojo/.logs/presetup-complete ] && echo "Pre-setup has already run, disabling service"; systemctl disable ronin-presetup.service; exit 0;
 
 echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NEWHOSTNAME"
-[ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Changing hostname $(hostname) to $NEWHOSTNAME"; sudo hostnamectl set-hostname "$NEWHOSTNAME" && shutdown -r now
-[ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Hostname $(hostname) is still not $NEWHOSTNAME"; exit 1;
+[ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME"; && shutdown -r now
+[ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; exit 1;
 
 echo "$(ls -l /home)" # DEBUG ownership of home folder
 
