@@ -9,16 +9,16 @@ useradd -c "tor" tor
 #removes the first user login requirement with monitor and keyboard
 rm /root/.not_logged_in_yet 
 
-echo "set hostname"
-hostname -b "ronindebian"
+#echo "set hostname"
+#hostname -b "ronindebian"
 
 # RoninDojo part
 TMPDIR=/var/tmp
 USER="ronindojo"
 PASSWORD="Ronindojo369" # test purposes only
-#PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c'21')"
-#ROOTPASSWORD="password" ## for testing purposes only
-ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c'21')"
+ROOTPASSWORD="Ronindojo369" # test purposes only
+#PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21 2>/dev/null)"
+#ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21 2>/dev/null)"
 FULLNAME="RoninDojo"
 TIMEZONE="UTC"
 LOCALE="en_US.UTF-8"
