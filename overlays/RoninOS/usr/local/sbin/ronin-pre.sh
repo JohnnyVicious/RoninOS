@@ -29,6 +29,13 @@ if [ ! -f /home/"${USER}"/.config/RoninDojo/config.json ]; then
     cat <<EOF >/home/"${USER}"/.config/RoninDojo/info.json
 {"user":[{"name":"${USER}","password":"${PASSWORD}"},{"name":"root","password":"${ROOTPASSWORD}"}]}
 EOF
+    # add validation for that the setup was done.
+    GENERATE_MESSAGE="Your password was randomly generated during System Setup."
+    TIMESTAMP=$(date)
+    cat <<EOF >/home/"${USER}"/.logs/pass_gen_timestamp.txt
+$GENERATE_MESSAGE
+Date and Time: $TIMESTAMP
+EOF
 fi
 
 # Check if pre-reqs for the ronin-setup.service are fulfilled
