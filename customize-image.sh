@@ -294,9 +294,8 @@ main(){
     # clone the original RoninOS
     
     git clone $(echo "$REPO") /tmp/RoninOS
-    # Changed: don't overwrite (Armbian build)
-    cp -Rvn /tmp/RoninOS/overlays/RoninOS/usr/* /usr/
-    cp -Rvn /tmp/RoninOS/overlays/RoninOS/etc/* /etc/
+    cp -Rv /tmp/RoninOS/overlays/RoninOS/usr/* /usr/
+    cp -Rv /tmp/RoninOS/overlays/RoninOS/etc/* /etc/
     
     ### sanity check ###
 
@@ -326,8 +325,8 @@ main(){
         rm -rf /etc/nginx/sites-enabled/default        
 	_install_ronin_ui
         usermod -aG docker ronindojo
-        systemctl enable oem-boot.service
-        _service_checks
+        systemctl enable oem-boot.service # (does not work on Armbian build)
+	_service_checks # (does not work on Armbian build)
         echo "Setup is complete"
     fi
 }
