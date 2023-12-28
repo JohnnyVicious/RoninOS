@@ -13,9 +13,9 @@ ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
 sleep 60s
 
 echo "Making sure the ronin-setup.service is disabled"
-systemctl is-enabled --quiet ronin-setup.service && systemctl disable --now ronin-setup.service
+systemctl is-enabled --quiet ronin-setup.service && (echo "ronin-setup.service was still enabled, stopping and disabling..."; systemctl disable --now ronin-setup.service)
 
-[ -f /home/ronindojo/.logs/presetup-complete ] && (echo "Pre-setup has already run, disabling service"; systemctl disable ronin-pre.service; exit 0;)
+[ -f /home/ronindojo/.logs/presetup-complete ] && (echo "Pre-setup has already run, disabling service"; systemctl disable --now ronin-pre.service; exit 0;)
 
 echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
@@ -59,3 +59,4 @@ echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set de
 echo "Enabling the RoninDojo setup service after everything has been validated"
 touch /home/ronindojo/.logs/presetup-complete
 systemctl enable --now ronin-setup.service
+systemctl disable ronin-pre.service
