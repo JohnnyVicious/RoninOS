@@ -19,7 +19,14 @@ cd /home/ronindojo/RoninDojo
 # Run main
 if _main; then
     # Check and enable passwordless sudo
-    grep -q "${USER}.*NOPASSWD:ALL" /etc/sudoers || sudo sed -i "/${USER}/s/ALL) ALL/ALL) NOPASSWD:ALL/" /etc/sudoers
+    USER="ronindojo"
+    
+    if sudo -n true 2>/dev/null; then
+        echo "User $USER has passwordless sudo access."
+    else
+        echo "Error: User $USER does not have passwordless sudo access"; 
+        exit 1;
+    fi
     
     # Run system setup
     Scripts/Install/install-system-setup.sh system
