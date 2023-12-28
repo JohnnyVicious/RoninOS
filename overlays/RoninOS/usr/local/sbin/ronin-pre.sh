@@ -19,6 +19,7 @@ echo "$(ls -l /home)" # DEBUG ownership of home folder
 
 echo "Set the owner for the home folder" # noticed this does not (always?) happen during the Armbian build
 chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
+usermod -aG docker "$RONINUSER"
 
 echo "Enable passwordless sudo for $RONINUSER"
 grep -q "${RONINUSER}.*NOPASSWD:ALL" /etc/sudoers || sed -i "/${RONINUSER}/s/ALL) ALL/ALL) NOPASSWD:ALL/" /etc/sudoers
