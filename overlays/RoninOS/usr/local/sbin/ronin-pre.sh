@@ -12,6 +12,7 @@ systemctl is-enabled --quiet ronin-setup.service && systemctl disable --now roni
 
 echo "Set the hostname and reboot, since this service will be disabled after its run this should not create conflicts when the user changes the hostname"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Changing hostname to $NEWHOSTNAME"; hostnamectl hostname "$NEWHOSTNAME" && shutdown -r now
+[ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Hostname is still not $NEWHOSTNAME"; exit 1;
 
 echo "$(ls -l /home)" # DEBUG ownership of home folder
 
