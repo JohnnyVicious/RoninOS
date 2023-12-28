@@ -24,9 +24,8 @@ if _main; then
     if sudo -n true 2>/dev/null; then
         echo "User $USER has passwordless sudo access."
     else
-        echo "Error: User $USER does not have passwordless sudo access"; 
-        # Set DEBUG password
-        chpasswd <<<"$USER:Ronindojo369"
+        echo "Error: User $USER does not have passwordless sudo access";
+        cat /home/"$USER"/.config/RoninDojo/config.json
         exit 1;
     fi
     
