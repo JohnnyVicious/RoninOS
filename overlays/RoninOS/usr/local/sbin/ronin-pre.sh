@@ -14,13 +14,15 @@ echo "Making sure the ronin-setup.service is disabled"
 systemctl is-enabled --quiet ronin-setup.service && systemctl disable --now ronin-setup.service
 
 echo "Set the hostname and reboot, since this service will be disabled after its run this should not create conflicts when the user changes the hostname"
-[ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Changing hostname to $NEWHOSTNAME"; hostnamectl hostname "$NEWHOSTNAME" && shutdown -r now
+[ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Changing hostname to $NEWHOSTNAME"; hostnamectl set-hostname "$NEWHOSTNAME" && shutdown -r now
 [ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Hostname is still not $NEWHOSTNAME"; exit 1;
 
 echo "$(ls -l /home)" # DEBUG ownership of home folder
 
-echo "Set the owner for the home folder" # noticed this does not (always?) happen during the Armbian build
+echo "Set the owner to $RONINUSER for the $RONINUSER home folder" # noticed this does not (always?) happen during the Armbian build
 chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
+
+echo "Add user $RONINUSER to the docker group for sudo-less access to commands"
 usermod -aG docker "$RONINUSER"
 
 echo "Enable passwordless sudo for $RONINUSER"
