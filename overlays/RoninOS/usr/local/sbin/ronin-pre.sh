@@ -48,4 +48,5 @@ echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set de
 [ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; chpasswd <<<"$RONINUSER:Ronindojo369"; exit 1;)
 
 echo "Enabling the RoninDojo setup service after everything has been validated"
+touch /home/ronindojo/.logs/presetup-complete
 systemctl enable --now ronin-setup.service
