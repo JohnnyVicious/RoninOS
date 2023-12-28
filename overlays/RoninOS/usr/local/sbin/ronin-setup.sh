@@ -18,6 +18,9 @@ cd /home/ronindojo/RoninDojo
 
 # Run main
 if _main; then
+    # Check and enable passwordless sudo
+    grep -q "${USER}.*NOPASSWD:ALL" /etc/sudoers || sudo sed -i "/${USER}/s/ALL) ALL/ALL) NOPASSWD:ALL/" /etc/sudoers
+    
     # Run system setup
     Scripts/Install/install-system-setup.sh system
 
@@ -28,7 +31,7 @@ if _main; then
     sudo systemctl start ronin-post.service
     if ! systemctl is-active pm2-ronindojo.service; then
         sudo systemctl start pm2-ronindojo.service
-    fi
-    sudo systemctl disable ronin-setup.service
+    fi    
+    sudo systemctl disable ronin-setup.service    
     touch /home/ronindojo/.logs/setup-complete
 fi
