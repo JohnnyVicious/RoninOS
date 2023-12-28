@@ -5,6 +5,8 @@
 echo "Continue only if you can access the service user's home folder"
 cd "$HOME" || exit
 
+# /home/ronindojo/.logs/presetup-complete
+
 echo "Give time for Startup to finish before trying to update the repo"
 sleep 30s 
 
