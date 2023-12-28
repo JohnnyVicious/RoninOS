@@ -1,8 +1,10 @@
 #!/bin/bash
 
-echo "add user roinindojo"
-useradd -s /bin/bash -m -c "ronindojo" ronindojo -p rock
-useradd -c "tor" tor && echo "ronindojo    ALL=(ALL) ALL" >> /etc/sudoers
+# Add user ronindojo and add to sudoers
+useradd -s /bin/bash -m -c "ronindojo" ronindojo -p "$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c'21')"
+echo "ronindojo    ALL=(ALL) ALL" >> /etc/sudoers
+# Add user tor
+useradd -c "tor" tor
 
 #removes the first user login requirement with monitor and keyboard
 rm /root/.not_logged_in_yet 
@@ -28,8 +30,11 @@ _create_oem_install() {
     # Setting root password
     chpasswd <<<"root:$ROOTPASSWORD"
 
-    # Adding user $USER
-    useradd -m -G wheel,sys,audio,input,video,storage,lp,network,users,power -s /bin/bash "$USER" &>/dev/null
+    # Adding user $USER (split up to avoid non-exec in case of error, groups were invalid before so user didn't get added to any)
+    useradd -m -G users "$USER"
+    usermod -s /bin/bash "$USER"
+    for group in sys audio input video lp; do usermod -aG "$group" "$USER"; done
+    chown -R "${USER}":"${USER}" /home/"${USER}"
 
     # Set User and WorkingDirectory in ronin-setup.service unit file
     sed -i -e "s/User=.*$/User=${USER}/" \
@@ -41,18 +46,18 @@ _create_oem_install() {
     # Setting password for $USER
     chpasswd <<<"$USER:$PASSWORD"
 
-    # Save Linux user credentials for UI access
+    # Save Linux user credentials for UI access (does not work on Armbian build)
     mkdir -p /home/"${USER}"/.config/RoninDojo
     cat <<EOF >/home/"${USER}"/.config/RoninDojo/info.json
 {"user":[{"name":"${USER}","password":"${PASSWORD}"},{"name":"root","password":"${ROOTPASSWORD}"}]}
 EOF
     chown -R "${USER}":"${USER}" /home/"${USER}"/.config
 
-    # Setting timezone to $TIMEZONE
+    # Setting timezone to $TIMEZONE (does not work on Armbian build)
     timedatectl set-timezone $TIMEZONE &>/dev/null
     timedatectl set-ntp true &>/dev/null
 
-    # Generating $LOCALE locale
+    # Generating $LOCALE locale (does not work on Armbian build)
     sed -i "s/#$LOCALE/$LOCALE/" /etc/locale.gen &>/dev/null
     locale-gen &>/dev/null
     localectl set-locale $LOCALE &>/dev/null
@@ -65,12 +70,13 @@ EOF
         fi
     fi
 
-    # Setting hostname to $HOSTNAME
-    hostnamectl set-hostname $HOSTNAME &>/dev/null
+    # Setting hostname to $HOSTNAME (does not work on Armbian build)
+    hostnamectl hostname $HOSTNAME &>/dev/null
 
-    # Resizing partition
+    # Resizing partition (does not work on Armbian build)
     resize-fs &>/dev/null
 
+    # (does not work on Armbian build)
     loadkeys "$KEYMAP"
 
     # Configuration complete. Cleaning up
@@ -93,9 +99,10 @@ EOF
     # Enable passwordless sudo
     sed -i '/ronindojo/s/ALL) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers # change to no password
 
-    echo -e "domain .local\nnameserver 1.1.1.1\nnameserver 1.0.0.1" >> /etc/resolv.conf
+    # Not sure what the (security) motivation is for this, commented because home routers often use .local (FEEDBACK)
+    # echo -e "domain .local\nnameserver 1.1.1.1\nnameserver 1.0.0.1" >> /etc/resolv.conf
     
-    # Setup logs for outputs
+    # Setup logs for outputs (does not work on Armbian build)
     mkdir -p /home/ronindojo/.logs
     touch /home/ronindojo/.logs/setup.logs
     touch /home/ronindojo/.logs/post.logs
@@ -103,6 +110,7 @@ EOF
 }
 
 _service_checks(){  
+    # Not sure if this works on Armbian build, assuming they all get enabled by default in the image
     if ! systemctl is-enabled tor.service; then
         systemctl enable tor.service
     fi
@@ -116,8 +124,13 @@ _service_checks(){
         systemctl enable motd.service
     fi
     
+    if ! systemctl is-enabled ronin-pre.service; then
+        systemctl enable ronin-pre.service
+    fi
+
     if ! systemctl is-enabled ronin-setup.service; then
-        systemctl enable ronin-setup.service
+        # Changed: service will get enabled after the ronin-pre.service ran
+	systemctl disable --now ronin-setup.service
     fi
 
     if ! systemctl is-enabled ronin-post.service; then
@@ -255,30 +268,54 @@ HiddenServicePort 80 127.0.0.1:8470\
 
 # This installs all required packages needed for RoninDojo. Clones the RoninOS repo so it can be copied to appropriate locations. Then runs all the functions defined above.
 main(){
+    USER="ronindojo"
+    # REPO= "https://code.samourai.io/ronindojo/RoninOS.git"
+    REPO="-b fix_ambian_setup https://github.com/JohnnyVicious/RoninOS.git"
+    
     # install dependencies
     apt-get update
-    apt-get install -y man-db git avahi-daemon nginx openjdk-11-jdk fail2ban net-tools htop unzip wget ufw rsync jq python3 python3-pip pipenv gdisk gcc curl apparmor ca-certificates gnupg lsb-release
+    # apt-get install -y man-db git avahi-daemon nginx openjdk-11-jdk fail2ban net-tools htop unzip wget ufw rsync jq python3 python3-pip pipenv gdisk gcc curl apparmor ca-certificates gnupg lsb-release
+    apt-get autoremove -y
+    for pkg in "${packages[@]}"; do
+        apt-get install -y "$pkg"	
+    done
+        
     apt-get install -y tor/bullseye-backports #install 0.4.7.x tor
+    
     # clone the original RoninOS
-    git clone https://code.samourai.io/ronindojo/RoninOS.git /tmp/RoninOS
-
-    cp -Rv /tmp/RoninOS/overlays/RoninOS/usr/* /usr/
-    cp -Rv /tmp/RoninOS/overlays/RoninOS/etc/* /etc/
+    
+    git clone "$REPO" /tmp/RoninOS
+    # Changed: don't overwrite (Armbian build)
+    cp -Rvn /tmp/RoninOS/overlays/RoninOS/usr/* /usr/
+    cp -Rvn /tmp/RoninOS/overlays/RoninOS/etc/* /etc/
+    
     ### sanity check ###
-    # TODO: Remove this after successful runs.
+
+    # Check each package installation status
+    for pkg in "${packages[@]}"; do
+        if dpkg -s "$pkg" >/dev/null 2>&1; then
+            echo "$pkg is installed."
+        else
+            echo "Error: $pkg is not installed."
+            # Handle the error, e.g., try to reinstall the package or exit
+	    exit 1;
+        fi
+    done
+
+    # Check if the ronin-setup.service exists
     if [ ! -f /usr/lib/systemd/system/ronin-setup.service ]; then
-        echo "ronin-setup.service is missing..."
-        echo "Still broken.. exiting"
+        echo "ronin-setup.service is missing..."	
         exit 1;
     else 
         echo "Setup service is PRESENT! Keep going!"
         _create_oem_install
         _prep_install
         _prep_tor
-        usermod -aG pm2 ronindojo
-        mkdir -p /usr/share/nginx/logs
-        rm -rf /etc/nginx/sites-enabled/default
-        _install_ronin_ui
+        # Changed: group pm2 does not exist (Armbian build)
+	# usermod -aG pm2 ronindojo        
+	mkdir -p /usr/share/nginx/logs
+        rm -rf /etc/nginx/sites-enabled/default        
+	_install_ronin_ui
         usermod -aG docker ronindojo
         systemctl enable oem-boot.service
         _service_checks
