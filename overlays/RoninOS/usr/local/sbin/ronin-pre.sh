@@ -23,9 +23,6 @@ echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NE
 
 echo "$(ls -l /home)" # DEBUG ownership of home folder
 
-echo "Set the owner to $RONINUSER for the $RONINUSER home folder" # noticed this does not (always?) happen during the Armbian build
-chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
-
 echo "Add user $RONINUSER to the docker group for sudo-less access to commands"
 usermod -aG docker "$RONINUSER"
 
@@ -52,6 +49,9 @@ fi
 
 echo "Check if the .logs folder exists, if not create and initiate logfiles"
 [ ! -d /home/ronindojo/.logs ] && mkdir -p /home/ronindojo/.logs && touch /home/ronindojo/.logs/{setup.logs,pre-setup.logs,post.logs}
+
+echo "Set the owner to $RONINUSER for the $RONINUSER home folder" # noticed this does not happen during the Armbian build even tho it is in the customize script
+chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
 echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $RONINUSER password for troubleshooting and exit"
 [ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; sudo chpasswd <<<"$RONINUSER:Ronindojo369"; exit 1;)
