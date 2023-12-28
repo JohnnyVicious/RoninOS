@@ -19,8 +19,8 @@ cd "$HOME" || exit 1;
 echo "Give time for Startup to finish before trying to clone the repo"
 sleep 30s
 REPO="-b master https://code.samourai.io/ronindojo/RoninDojo"
-[ ! -d /home/ronindojo/RoninDojo] && (echo "Cloning repo : $(echo $REPO)"; git clone "$(echo $REPO)" /home/ronindojo/RoninDojo)
-[ ! -d /home/ronindojo/RoninDojo] && (echo "Cloning repo failed!"; exit 1;)
+[ ! -d /home/ronindojo/RoninDojo ] && (echo "Cloning repo : $(echo $REPO)"; git clone "$(echo $REPO)" /home/ronindojo/RoninDojo)
+[ ! -d /home/ronindojo/RoninDojo ] && (echo "Cloning repo failed!"; exit 1;)
 cd /home/ronindojo/RoninDojo || exit 1;
 
 # Source files for default values and generic functions
