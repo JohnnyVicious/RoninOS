@@ -2,13 +2,13 @@
 
 # This service will run as the $USER, passwordless sudo should have been set at this point
 
-# Continue only if you can access the service user's home folder
+echo "Continue only if you can access the service user's home folder"
 cd "$HOME" || exit
 
-# give time for Startup to finish before trying to update the repo. 
+echo "Give time for Startup to finish before trying to update the repo"
 sleep 30s 
 
-# Clone Repo
+echo "Clone Repo"
 git clone -b master https://code.samourai.io/ronindojo/RoninDojo /home/ronindojo/RoninDojo
 cd /home/ronindojo/RoninDojo
 
@@ -18,8 +18,8 @@ cd /home/ronindojo/RoninDojo
 
 # Run main
 if _main; then
-    # Check and enable passwordless sudo
-    USER="ronindojo"
+    echo "Check if passwordless sudo is enabled"
+    # USER="ronindojo"
     
     if sudo -n true 2>/dev/null; then
         echo "User $USER has passwordless sudo access."
