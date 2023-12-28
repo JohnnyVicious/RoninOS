@@ -15,8 +15,6 @@ systemctl is-enabled --quiet ronin-setup.service && systemctl disable --now roni
 
 [ -f /home/ronindojo/.logs/presetup-complete ] && echo "Pre-setup has already run, disabling service"; systemctl disable ronin-presetup.service; exit 0;
 
-sleep 30s
-
 echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Changing hostname $(hostname) to $NEWHOSTNAME"; sudo hostnamectl set-hostname "$NEWHOSTNAME" && shutdown -r now
 [ "$(hostname)" != "$NEWHOSTNAME" ] && echo "Hostname $(hostname) is still not $NEWHOSTNAME"; exit 1;
@@ -50,10 +48,11 @@ Date and Time: $TIMESTAMP
 EOF
 fi
 
+echo "Check if the .logs folder exists, if not create and initiate logfiles"
 [ ! -d /home/ronindojo/.logs ] && mkdir -p /home/ronindojo/.logs && touch /home/ronindojo/.logs/{setup.logs,pre-setup.logs,post.logs}
 
 echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $RONINUSER password for troubleshooting and exit"
-[ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; chpasswd <<<"$RONINUSER:Ronindojo369"; exit 1;)
+[ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; sudo chpasswd <<<"$RONINUSER:Ronindojo369"; exit 1;)
 
 echo "Enabling the RoninDojo setup service after everything has been validated"
 touch /home/ronindojo/.logs/presetup-complete
