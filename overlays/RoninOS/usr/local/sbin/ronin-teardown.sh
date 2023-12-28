@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[ ! -f /home/ronindojo/.logs/presetup-complete ] && sleep 30s; exit 0;
+[ ! -f /home/ronindojo/.logs/presetup-complete ] && (sleep 30s; exit 0;)
 
 echo "Waiting to resurrect PM2"
 while [ ! -f /home/ronindojo/.logs/setup-complete ]
