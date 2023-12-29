@@ -53,7 +53,9 @@ fi
 echo "Check if the .logs folder exists, if not create and initiate logfiles"
 [ ! -d /home/ronindojo/.logs ] && mkdir -p /home/ronindojo/.logs && touch /home/ronindojo/.logs/{setup.logs,pre-setup.logs,post.logs}
 
-echo "Set the owner to $RONINUSER for the $RONINUSER home folder and all subfolders" # noticed this does not happen during the Armbian build even tho it is in the customize script, also needed after creating files in this service
+echo "Set the owner to $RONINUSER for the $RONINUSER home folder and all subfolders" 
+# Noticed this does not happen during the Armbian build even if it is in the customize script
+# Needed for ronin-setup.service that runs as ronindojo user
 chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
 echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $RONINUSER password for troubleshooting and exit"
