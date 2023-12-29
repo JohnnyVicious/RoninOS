@@ -288,7 +288,8 @@ main(){
         apt-get install -y "$pkg"	
     done
         
-    apt-get install -y tor/bullseye-backports #install 0.4.7.x tor
+    #install 0.4.7.x tor
+    if [ "$(lsb_release -is)" = "Debian" ]; then apt-get install -y tor/bullseye-backports; else echo "This script runs on Debian. Detected: $(lsb_release -is)"; apt-get install -y tor; fi
     
     # clone the original RoninOS
     
