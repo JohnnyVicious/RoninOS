@@ -46,7 +46,7 @@ if _main; then
     # Run RoninDojo install
     Scripts/Install/install-dojo.sh dojo
 
-    echo "RoninDojo IP address is : $(ip address)"
+    echo "RoninDojo IP address is : $(ip addr show | grep -E '^\s*inet\b' | grep -Ev '127\.0\.0\.1|inet6' | grep -E 'eth|wlan' | awk '{print $2}' | cut -d'/' -f1)"
 
     # Restore getty
     sudo systemctl start ronin-post.service
