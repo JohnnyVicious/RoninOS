@@ -23,6 +23,7 @@ systemctl is-enabled --quiet ronin-setup.service && (echo "ronin-setup.service w
 echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; exit 1;)
+echo "127.0.0.1 $(hostname)" | sudo tee -a /etc/hosts # Make hostname resolvable to loopback address
 
 echo "$(ls -l /home)" # DEBUG ownership of home folder
 
