@@ -109,6 +109,18 @@ EOF
     chown -R ronindojo:ronindojo /home/ronindojo/.logs
 }
 
+check_and_install() {
+    dpkg -s "$1" &> /dev/null
+    if [ $? -ne 0 ]; then
+        echo "Installing $1..."
+        sudo apt-get install -y "$1"
+        if [ $? -ne 0 ]; then
+            echo "Error: Failed to install $1."
+            exit 1
+        fi
+    fi
+}
+
 _service_checks(){  
     # Not sure if this works on Armbian build, assuming they all get enabled by default in the image
     if ! systemctl is-enabled tor.service; then
@@ -151,7 +163,8 @@ _prep_install(){
     "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$DISTRO \
     $RELEASE stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
     apt-get update
-    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin)
+    for pkg in "${packages[@]}"; do check_and_install "$pkg"; done
 
     echo "Installing docker-compose"
     ARCHICTECTURE="aarch64"
@@ -210,8 +223,6 @@ _install_ronin_ui(){
     cd /home/ronindojo || exit
 
     npm i -g pnpm@7 &>/dev/null
-
-    #sudo npm install pm2 -g
 
     test -d /home/ronindojo/Ronin-UI || mkdir /home/ronindojo/Ronin-UI
     cd /home/ronindojo/Ronin-UI || exit
@@ -329,21 +340,8 @@ main(){
             ;;
     esac
 
-    # Install packages    
-    for pkg in "${packages[@]}"; do
-        apt-get install -y "$pkg"	
-    done        
-
-    # Check each package installation status
-    for pkg in "${packages[@]}"; do
-        if dpkg -s "$pkg" >/dev/null 2>&1; then
-            echo "$pkg is installed."
-        else
-            echo "Error: $pkg is not installed."
-            # Handle the error, e.g., try to reinstall the package or exit
-	    exit 1;
-        fi
-    done
+    # Check and install each package
+    for pkg in "${packages[@]}"; do check_and_install "$pkg"; done
 
     # clone the original RoninOS    
     git clone $(echo "$REPO") /tmp/RoninOS
