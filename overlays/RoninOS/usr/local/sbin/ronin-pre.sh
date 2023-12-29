@@ -12,6 +12,9 @@ ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
 
 sleep 60s
 
+# Noticed the SSH service sometimes fails during boot-up, retry after sleep, maybe network init related?
+systemctl is-active --quiet ssh.service || systemctl start ssh.service
+
 echo "Making sure the ronin-setup.service is disabled"
 systemctl is-enabled --quiet ronin-setup.service && (echo "ronin-setup.service was still enabled, stopping and disabling..."; systemctl disable --now ronin-setup.service)
 
