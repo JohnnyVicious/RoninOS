@@ -104,6 +104,7 @@ EOF
     
     # Setup logs for outputs (does not work on Armbian build)
     mkdir -p /home/ronindojo/.logs
+    touch /home/ronindojo/.logs/pre-setup.logs
     touch /home/ronindojo/.logs/setup.logs
     touch /home/ronindojo/.logs/post.logs
     chown -R ronindojo:ronindojo /home/ronindojo/.logs
