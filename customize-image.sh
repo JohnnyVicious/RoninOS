@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Add user ronindojo and add to sudoers
+# Add user ronndojo and add to sudoers
 useradd -s /bin/bash -m -c "ronindojo" ronindojo -p "$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c'21')"
 echo "ronindojo    ALL=(ALL) ALL" >> /etc/sudoers
 # Add user tor
