@@ -271,33 +271,69 @@ main(){
     # REPO= "https://code.samourai.io/ronindojo/RoninOS.git"
     REPO="-b fix_armbian_setup https://github.com/JohnnyVicious/RoninOS.git"
     
-    apt-get update
+    apt-get update    
     
     # Clean-up older packages
     apt-get autoremove -y
     
-    # List of packages to install
+    # List of universal packages to install
     packages=(
-        man-db git avahi-daemon nginx openjdk-11-jdk fail2ban
+        man-db git avahi-daemon nginx fail2ban
         net-tools htop unzip wget ufw rsync jq python3 python3-pip
-        pipenv gdisk gcc curl apparmor ca-certificates gnupg parted lsb-release
-    )
-    
+        pipenv gdisk gcc curl apparmor ca-certificates gnupg
+    )    
+
+    apt install -y lsb-release
+    distro=$(lsb_release -is)
+    release=$(lsb_release -cs)
+
+    case $distro in
+        Debian)
+            case $release in
+                bullseye)
+                    echo "Debian Bullseye detected."
+      		    release_specific_packages=( tor/bullseye-backports openjdk-11-jdk ) # 0.4.7.x tor 
+        	    packages=("${packages[@]}" "${release_specific_packages[@]}")
+                    ;;
+                bookworm)
+                    echo "Debian Bookworm detected."                    
+		    release_specific_packages=( tor openjdk-17-jdk )
+        	    packages=("${packages[@]}" "${release_specific_packages[@]}")
+                    ;;
+                *)
+                    echo "Unsupported Debian release: $release"
+		    exit 1;
+                    ;;
+            esac
+            ;;
+        Ubuntu)
+            case $release in
+                jammy)
+                    echo "Ubuntu Jammy (22.04) detected."
+		    release_specific_packages=( tor openjdk-11-jdk )
+        	    packages=("${packages[@]}" "${release_specific_packages[@]}")
+                    ;;
+                lunar)
+                    echo "Ubuntu Lunar (23.04) detected."
+		    release_specific_packages=( tor openjdk-11-jdk )
+        	    packages=("${packages[@]}" "${release_specific_packages[@]}")
+                   ;;
+                *)
+                    echo "Unsupported Ubuntu release: $release"
+                    exit 1
+                    ;;
+            esac
+            ;;
+        *)
+            echo "This script is intended for Ubuntu or Debian. Detected: $distro $release"
+            exit 1
+            ;;
+    esac
+
     # Install packages    
     for pkg in "${packages[@]}"; do
         apt-get install -y "$pkg"	
-    done
-        
-    #install 0.4.7.x tor
-    if [ "$(lsb_release -is)" = "Debian" ]; then apt-get install -y tor/bullseye-backports; else echo "This script runs on Debian. Detected: $(lsb_release -is)"; apt-get install -y tor; fi
-    
-    # clone the original RoninOS
-    
-    git clone $(echo "$REPO") /tmp/RoninOS
-    cp -Rv /tmp/RoninOS/overlays/RoninOS/usr/* /usr/
-    cp -Rv /tmp/RoninOS/overlays/RoninOS/etc/* /etc/
-    
-    ### sanity check ###
+    done        
 
     # Check each package installation status
     for pkg in "${packages[@]}"; do
@@ -309,6 +345,11 @@ main(){
 	    exit 1;
         fi
     done
+
+    # clone the original RoninOS    
+    git clone $(echo "$REPO") /tmp/RoninOS
+    cp -Rv /tmp/RoninOS/overlays/RoninOS/usr/* /usr/
+    cp -Rv /tmp/RoninOS/overlays/RoninOS/etc/* /etc/    
 
     # Check if the ronin-setup.service exists
     if [ ! -f /usr/lib/systemd/system/ronin-setup.service ]; then
