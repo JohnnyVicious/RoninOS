@@ -269,7 +269,7 @@ HiddenServicePort 80 127.0.0.1:8470\
 # This installs all required packages needed for RoninDojo. Clones the RoninOS repo so it can be copied to appropriate locations. Then runs all the functions defined above.
 main(){
     # REPO= "https://code.samourai.io/ronindojo/RoninOS.git"
-    REPO="-b fix_ambian_setup https://github.com/JohnnyVicious/RoninOS.git"
+    REPO="-b fix_armbian_setup https://github.com/JohnnyVicious/RoninOS.git"
     
     apt-get update
     
