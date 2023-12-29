@@ -46,6 +46,8 @@ if _main; then
     # Run RoninDojo install
     Scripts/Install/install-dojo.sh dojo
 
+    echo "RoninDojo IP address is : $(ip address)"
+
     # Restore getty
     sudo systemctl start ronin-post.service
     if ! systemctl is-active pm2-ronindojo.service; then
