@@ -369,6 +369,13 @@ main(){
 	chmod +x /usr/local/sbin/*.sh
         systemctl enable oem-boot.service # (does not work on Armbian build)
 	_service_checks # (does not work on Armbian build)
+
+	if [ -f /etc/armbian-release ]; then
+    	    echo "Running on Armbian."
+	else
+    	    echo "Not running on Armbian."
+	fi
+ 
         echo "Setup is complete"
     fi
 }
