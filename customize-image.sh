@@ -283,11 +283,11 @@ main(){
     )    
 
     apt install -y lsb-release
-    export distro=$(lsb_release -is)
-    release=$(lsb_release -cs)
+    export distro="$(lsb_release -is | tr '[:upper:]' '[:lower:]')"
+    release="$(lsb_release -cs | tr '[:upper:]' '[:lower:]')"
 
     case $distro in
-        Debian)
+        debian)
             case $release in
                 bullseye)
                     echo "Debian Bullseye detected."
@@ -305,7 +305,7 @@ main(){
                     ;;
             esac
             ;;
-        Ubuntu)
+        ubuntu)
             case $release in
                 jammy)
                     echo "Ubuntu Jammy (22.04) detected."
