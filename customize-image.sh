@@ -283,12 +283,12 @@ main(){
     )    
 
     apt install -y lsb-release
-    export distro="$(lsb_release -is | tr '[:upper:]' '[:lower:]')"
-    release="$(lsb_release -cs | tr '[:upper:]' '[:lower:]')"
+    export DISTRO="$(lsb_release -is | tr '[:upper:]' '[:lower:]')"
+    RELEASE="$(lsb_release -cs | tr '[:upper:]' '[:lower:]')"
 
-    case $distro in
+    case $DISTRO in
         debian)
-            case $release in
+            case $RELEASE in
                 bullseye)
                     echo "Debian Bullseye detected."
       		    release_specific_packages=( tor/bullseye-backports openjdk-11-jdk ) # 0.4.7.x tor 
@@ -306,7 +306,7 @@ main(){
             esac
             ;;
         ubuntu)
-            case $release in
+            case $RELEASE in
                 jammy)
                     echo "Ubuntu Jammy (22.04) detected."
 		    release_specific_packages=( tor openjdk-11-jdk )
@@ -324,7 +324,7 @@ main(){
             esac
             ;;
         *)
-            echo "This script is intended for Ubuntu or Debian. Detected: $distro $release"
+            echo "This script is intended for Ubuntu or Debian. Detected: $DISTRO $RELEASE"
             exit 1
             ;;
     esac
