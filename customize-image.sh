@@ -112,7 +112,7 @@ EOF
 check_and_install() {
     dpkg -s "$1" &> /dev/null
     if [ $? -ne 0 ]; then
-        echo "Installing $1..."
+        echo "[check_and_install] Installing $1..."
         sudo apt-get install -y "$1"
         if [ $? -ne 0 ]; then
             echo "Error: Failed to install $1."
