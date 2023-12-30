@@ -142,7 +142,7 @@ _service_checks(){
 
     if ! systemctl is-enabled ronin-setup.service; then
         # Changed: service will get enabled after the ronin-pre.service ran
-	systemctl disable --now ronin-setup.service
+	systemctl disable ronin-setup.service
     fi
 
     if ! systemctl is-enabled ronin-post.service; then
@@ -371,8 +371,8 @@ main(){
 	_install_ronin_ui
         usermod -aG docker ronindojo
 	chmod +x /usr/local/sbin/*.sh
-        systemctl enable oem-boot.service # (does not work on Armbian build)
-	[ ! $ARMBIANBUILD ]  && _service_checks
+        systemctl enable oem-boot.service
+	_service_checks
         echo "Setup is complete"
     fi
 }
