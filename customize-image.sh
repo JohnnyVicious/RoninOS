@@ -284,8 +284,8 @@ main(){
     
     apt-get update    
     
-    # Clean-up older packages
-    apt-get autoremove -y
+    # Clean-up older packages (commented to test if this broke building in ronin-setup.sh)
+    # apt-get autoremove -y
     
     # List of universal packages to install
     packages=(
