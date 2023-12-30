@@ -284,14 +284,13 @@ main(){
     
     apt-get update    
     
-    # Clean-up older packages (commented to test if this broke building in ronin-setup.sh)
-    # apt-get autoremove -y
+    # Do NOT clean-up older packages, Armbian build will suggest to use 'apt autoremove', that would break building in ronin-setup.sh
     
     # List of universal packages to install
     packages=(
         man-db git avahi-daemon nginx fail2ban
         net-tools htop unzip wget ufw rsync jq python3 python3-pip
-        pipenv gdisk gcc curl apparmor ca-certificates gnupg libevent-dev make
+        pipenv gdisk gcc curl apparmor ca-certificates gnupg
     )    
 
     apt install -y lsb-release
