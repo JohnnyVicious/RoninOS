@@ -1,6 +1,10 @@
 #!/bin/bash
 
-# journal+console+file:/home/ronindojo/.logs/pre-setup.logs
+if [ "$(id -u)" -ne 0 ]; then
+    echo "This script must be run as root" >&2
+    exit 1
+fi
+
 # Parameters
 NEWHOSTNAME="RoninDojo"
 RONINUSER="ronindojo"
@@ -10,10 +14,11 @@ RONINUSER="ronindojo"
 PASSWORD="Ronindojo369"
 ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
 
-sleep 60s
+# Wait for other system services to complete
+sleep 75s
 
 # Noticed the SSH service sometimes fails during boot-up, retry after sleep, maybe network init related?
-systemctl is-active --quiet ssh.service || systemctl start ssh.service
+systemctl is-active --quiet ssh.service || (echo "SSH not started, trying to start..."; systemctl start ssh.service)
 
 echo "Making sure the ronin-setup.service is disabled"
 systemctl is-enabled --quiet ronin-setup.service && (echo "ronin-setup.service was still enabled, stopping and disabling..."; systemctl disable --now ronin-setup.service)
@@ -23,7 +28,7 @@ systemctl is-enabled --quiet ronin-setup.service && (echo "ronin-setup.service w
 echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; exit 1;)
-echo "127.0.0.1 $(hostname)" | sudo tee -a /etc/hosts # Make hostname resolvable to loopback address
+echo "127.0.0.1 $(hostname)" | tee -a /etc/hosts # Make hostname resolvable to loopback address
 
 echo "$(ls -l /home)" # DEBUG ownership of home folder
 
@@ -60,7 +65,7 @@ echo "Set the owner to $RONINUSER for the $RONINUSER home folder and all subfold
 chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
 echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $RONINUSER password for troubleshooting and exit"
-[ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; sudo chpasswd <<<"$RONINUSER:Ronindojo369"; exit 1;)
+[ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; chpasswd <<<"$RONINUSER:Ronindojo369"; exit 1;)
 
 echo "Enabling the RoninDojo setup service after everything has been validated"
 touch /home/ronindojo/.logs/presetup-complete
