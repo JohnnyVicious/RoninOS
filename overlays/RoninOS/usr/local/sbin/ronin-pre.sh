@@ -18,11 +18,6 @@ chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
 [ -f /home/ronindojo/.logs/presetup-complete ] && (echo "Pre-setup has already run, disabling service"; systemctl disable --now ronin-pre.service; exit 0;)
 
-# Generate random 21 char alphanumeric passwords for root and $RONINUSER
-#PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
-PASSWORD="Ronindojo369" # Not entirely sure setting a random password for ronindojo is necessary before the final application install, makes troubleshooting a new build impossible
-ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
-
 # ronin-setup.service starts at the same time during boot-up, making sure it is disabled before the wait
 echo "Making sure the ronin-setup.service is disabled"
 systemctl is-enabled --quiet ronin-setup.service && (echo "ronin-setup.service was still enabled, stopping and disabling..."; systemctl disable --now ronin-setup.service)
@@ -45,6 +40,10 @@ usermod -aG docker "$RONINUSER"
 
 echo "Set and store the random passwords if config.json does not already exist"
 if [ ! -f /home/"${RONINUSER}"/.config/RoninDojo/config.json ]; then
+# Generate random 21 char alphanumeric passwords for root and $RONINUSER
+    #PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
+    PASSWORD="Ronindojo369" # Not entirely sure setting a random password for ronindojo is necessary before the final application install, makes troubleshooting a new build impossible
+    ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
     echo "Adding the random generated passwords to info.json, $RONINUSER:$PASSWORD"
     mkdir -p /home/"${RONINUSER}"/.config/RoninDojo
     chpasswd <<<"root:$ROOTPASSWORD"
@@ -59,7 +58,8 @@ EOF
 $GENERATE_MESSAGE
 Date and Time: $TIMESTAMP
 EOF
-fi
+    chown -R "$RONINUSER":"$RONINUSER" /home/"${RONINUSER}"/.config/RoninDojo
+fi # end of config.json
 
 echo "Check if the .logs folder exists, if not create and initiate logfiles"
 [ ! -d /home/ronindojo/.logs ] && mkdir -p /home/ronindojo/.logs && touch /home/ronindojo/.logs/{setup.logs,pre-setup.logs,post.logs}
@@ -75,4 +75,4 @@ echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set de
 echo "Enabling the RoninDojo setup service after everything has been validated"
 touch /home/ronindojo/.logs/presetup-complete
 systemctl enable --now ronin-setup.service
-systemctl disable ronin-pre.service
+systemctl disable --now ronin-pre.service
