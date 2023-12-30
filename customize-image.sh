@@ -372,7 +372,7 @@ main(){
         usermod -aG docker ronindojo
 	chmod +x /usr/local/sbin/*.sh
         systemctl enable oem-boot.service
-	_service_checks
+	_service_checks # Armbian confirmed
         echo "Setup is complete"
     fi
 }
