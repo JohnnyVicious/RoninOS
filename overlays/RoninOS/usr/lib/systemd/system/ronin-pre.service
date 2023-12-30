@@ -6,8 +6,8 @@ Wants=oem-boot.service network-online.target
 [Service]
 Type=simple
 ExecStart=/usr/local/sbin/ronin-pre.sh
-StandardOutput=journal+console
-StandardError=journal+console
+StandardOutput=journal+console+file:/home/ronindojo/.logs/pre-setup.logs
+StandardError=journal+console+file:/home/ronindojo/.logs/pre-setup.logs
 
 [Install]
 WantedBy=multi-user.target
