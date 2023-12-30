@@ -15,10 +15,9 @@ rm /root/.not_logged_in_yet
 # RoninDojo part
 TMPDIR=/var/tmp
 RONINUSER="ronindojo"
-PASSWORD="Ronindojo369" # test purposes only
-ROOTPASSWORD="Ronindojo369" # test purposes only
-#PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21 2>/dev/null)"
-#ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21 2>/dev/null)"
+# Setting a random password for the users is necessary before the final application install, makes troubleshooting a new build impossible
+PASSWORD="Ronindojo369"
+ROOTPASSWORD="Ronindojo369"
 FULLNAME="RoninDojo"
 TIMEZONE="UTC"
 LOCALE="en_US.UTF-8"
@@ -281,6 +280,14 @@ HiddenServicePort 80 127.0.0.1:8470\
 main(){
     # REPO= "https://code.samourai.io/ronindojo/RoninOS.git"
     REPO="-b fix_armbian_setup https://github.com/JohnnyVicious/RoninOS.git"
+
+    if [ -f /etc/armbian-release ]; then
+    	echo "Running on Armbian."
+        ARMBIANBUILD=1
+    else
+        echo "Not running on Armbian."
+	ARMBIANBUILD=0
+    fi
     
     apt-get update    
     
@@ -365,14 +372,7 @@ main(){
         usermod -aG docker ronindojo
 	chmod +x /usr/local/sbin/*.sh
         systemctl enable oem-boot.service # (does not work on Armbian build)
-	_service_checks # (does not work on Armbian build)
-
-	if [ -f /etc/armbian-release ]; then
-    	    echo "Running on Armbian."
-	else
-    	    echo "Not running on Armbian."
-	fi
- 
+	[ ! $ARMBIANBUILD ]  && _service_checks
         echo "Setup is complete"
     fi
 }
