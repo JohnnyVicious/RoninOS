@@ -297,7 +297,7 @@ main(){
     packages=(
         man-db git avahi-daemon nginx fail2ban
         net-tools htop unzip wget ufw rsync jq python3 python3-pip
-        pipenv gdisk gcc curl apparmor ca-certificates gnupg
+        pipenv gdisk gcc curl apparmor ca-certificates gnupg libevent-dev netcat-openbsd make
     )    
 
     apt install -y lsb-release
