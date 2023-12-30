@@ -9,11 +9,6 @@ fi
 NEWHOSTNAME="RoninDojo"
 RONINUSER="ronindojo"
 
-# Generate random 21 char alphanumeric passwords for root and $RONINUSER
-#PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
-PASSWORD="Ronindojo369" # Not entirely sure setting a random password for ronindojo is 
-ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
-
 # This service also starts when ronin-setup.service gets invoked, making sure this is always executed even if pre-setup already ran
 echo "Enable passwordless sudo for $RONINUSER"
 grep -q "${RONINUSER}.*NOPASSWD:ALL" /etc/sudoers || sed -i "/${RONINUSER}/s/ALL) ALL/ALL) NOPASSWD:ALL/" /etc/sudoers
@@ -22,6 +17,11 @@ grep -q "${RONINUSER}.*NOPASSWD:ALL" /etc/sudoers || sed -i "/${RONINUSER}/s/ALL
 chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
 [ -f /home/ronindojo/.logs/presetup-complete ] && (echo "Pre-setup has already run, disabling service"; systemctl disable --now ronin-pre.service; exit 0;)
+
+# Generate random 21 char alphanumeric passwords for root and $RONINUSER
+#PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
+PASSWORD="Ronindojo369" # Not entirely sure setting a random password for ronindojo is necessary before the final application install, makes troubleshooting a new build impossible
+ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
 
 # ronin-setup.service starts at the same time during boot-up, making sure it is disabled before the wait
 echo "Making sure the ronin-setup.service is disabled"
