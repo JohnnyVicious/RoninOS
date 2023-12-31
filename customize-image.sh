@@ -374,6 +374,7 @@ main(){
 	chmod +x /usr/local/sbin/*.sh
         systemctl enable oem-boot.service
 	_service_checks # Armbian confirmed
+ 	apt-get upgrade && apt-get upgrade -y
         echo "Setup is complete"
     fi
 }
