@@ -298,6 +298,7 @@ main(){
         man-db git avahi-daemon nginx fail2ban
         net-tools htop unzip wget ufw rsync jq python3 python3-pip
         pipenv gdisk gcc curl apparmor ca-certificates gnupg libevent-dev netcat-openbsd make
+	zlib1g-dev libssl-dev make automake autoconf musl-dev coreutils gpg
     )    
 
     apt install -y lsb-release
