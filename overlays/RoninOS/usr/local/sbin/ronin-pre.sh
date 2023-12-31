@@ -69,6 +69,8 @@ echo "Set the owner to $RONINUSER for the $RONINUSER home folder and all subfold
 # Needed for ronin-setup.service that runs as ronindojo user, second time after all has been executed since this runs as root and that will be the owner of new files
 chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
+apt-get upgrade && apt-get upgrade -y
+
 echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $RONINUSER password for troubleshooting and exit"
 [ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; chpasswd <<<"$RONINUSER:Ronindojo369"; exit 1;)
 
