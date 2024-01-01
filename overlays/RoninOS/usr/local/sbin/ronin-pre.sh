@@ -71,11 +71,6 @@ chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
 apt-get upgrade && apt-get upgrade -y
 
-echo "Add UFW firewall rule to allow NTP"
-ufw allow 123/udp
-ufw allow out 123/udp
-ufw allow out 53
-
 echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $RONINUSER password for troubleshooting and exit"
 [ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; chpasswd <<<"$RONINUSER:Ronindojo369"; exit 1;)
 
