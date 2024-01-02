@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "RoninDojo IP : $(ip addr show | grep -E '^\s*inet\b' | grep -Ev '127\.0\.0\.1|inet6' | grep -E 'eth|wlan' | awk '{print $2}' | cut -d'/' -f1)"
+echo "RoninDojo Model : $(tr -d '\0' < /proc/device-tree/model)"
+
 # This service will run as the $USER, passwordless sudo should have been set at this point
 echo "Check if passwordless sudo is enabled for user $USER"  
 if sudo -n true 2>/dev/null; then
@@ -45,8 +48,7 @@ if _main; then
     # Run RoninDojo install
     Scripts/Install/install-dojo.sh dojo
 
-    echo "RoninDojo IP : $(ip addr show | grep -E '^\s*inet\b' | grep -Ev '127\.0\.0\.1|inet6' | grep -E 'eth|wlan' | awk '{print $2}' | cut -d'/' -f1)"
-    echo "RoninDojo Model : $(cat /proc/device-tree/model)"
+    # TODO: could add some checks to see if install completed succesfully
 
     # Restore getty
     sudo systemctl start ronin-post.service
