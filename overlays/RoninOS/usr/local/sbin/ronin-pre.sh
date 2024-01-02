@@ -95,6 +95,10 @@ fi # end of config.json
 echo "Check if the .logs folder exists, if not create and initiate logfiles"
 [ ! -d /home/ronindojo/.logs ] && mkdir -p /home/ronindojo/.logs && touch /home/ronindojo/.logs/{setup.logs,pre-setup.logs,post.logs}
 
+echo "Installing NPM packages"
+npm i -g pnpm@7
+npm install pm2 -g
+
 echo "Set the owner to $RONINUSER for the $RONINUSER home folder and all subfolders" 
 # Noticed this does not happen during the Armbian build even if it is in the customize script
 # Needed for ronin-setup.service that runs as ronindojo user, second time after all has been executed since this runs as root and that will be the owner of new files
