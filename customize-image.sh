@@ -113,7 +113,7 @@ check_and_install() {
     dpkg -s "$1" &> /dev/null
     if [ $? -ne 0 ]; then
         echo "[check_and_install] Installing $1..."
-        sudo apt-get install -y "$1"
+        apt-get install -y "$1"
         if [ $? -ne 0 ]; then
             echo "Error: Failed to install $1."
             exit 1
@@ -374,7 +374,7 @@ main(){
 	chmod +x /usr/local/sbin/*.sh
         systemctl enable oem-boot.service
 	_service_checks # Armbian confirmed
- 	# apt-get upgrade && apt-get upgrade -y
+ 	apt-get upgrade && apt-get upgrade -y
   	chown -R "${RONINUSER}":"${RONINUSER}" /home/"${RONINUSER}"
         echo "Setup is complete"
     fi
