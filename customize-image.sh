@@ -15,9 +15,9 @@ rm /root/.not_logged_in_yet
 # RoninDojo part
 TMPDIR=/var/tmp
 RONINUSER="ronindojo"
-# Setting a random password for the users is necessary before the final application install, makes troubleshooting a new build impossible
+# Setting a random password for the users is only necessary before the final application install, makes troubleshooting a new build impossible
 PASSWORD="Ronindojo369"
-ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c'21')"
+ROOTPASSWORD="Ronindojo369"
 FULLNAME="RoninDojo"
 TIMEZONE="UTC"
 LOCALE="en_US.UTF-8"
