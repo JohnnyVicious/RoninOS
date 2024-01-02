@@ -171,7 +171,7 @@ _prep_install(){
     curl -L https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-"$ARCHITECTURE" -o /usr/bin/docker-compose
     chmod +x /usr/bin/docker-compose
 
-    echo "Installing pm2" (does not work on Armbian build)
+    echo "Installing pm2" #(does not work on Armbian build)
     npm install pm2 -g
 }
 
