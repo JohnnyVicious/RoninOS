@@ -11,6 +11,7 @@ RONINUSER="ronindojo"
 
 # This service always starts when ronin-setup.service does
 
+echo "$(ls -l /home)" # DEBUG ownership of home folder after Armbian build
 # Needed for ronin-setup.service that runs as ronindojo user, making sure
 chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
@@ -65,8 +66,6 @@ echo "Unique hostname determined: $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; exit 1;)
 echo "127.0.0.1 $(hostname)" | tee -a /etc/hosts # Make hostname resolvable to loopback address
 
-echo "$(ls -l /home)" # DEBUG ownership of home folder
-
 echo "Add user $RONINUSER to the docker group for sudo-less access to commands"
 usermod -aG docker "$RONINUSER"
 
@@ -101,7 +100,7 @@ echo "Set the owner to $RONINUSER for the $RONINUSER home folder and all subfold
 # Needed for ronin-setup.service that runs as ronindojo user, second time after all has been executed since this runs as root and that will be the owner of new files
 chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
-apt-get upgrade && apt-get upgrade -y
+# apt-get upgrade && apt-get upgrade -y
 
 echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $RONINUSER password for troubleshooting and exit"
 [ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; chpasswd <<<"$RONINUSER:Ronindojo369"; exit 1;)
