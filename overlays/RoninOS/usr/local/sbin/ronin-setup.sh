@@ -60,7 +60,7 @@ if _main; then
     sudo systemctl disable ronin-setup.service            
     sudo systemctl disable --now ronin-pre.service
     
-    # Disable passwordless sudo
-    sudo sed -i '/ronindojo/s/ALL) NOPASSWD:ALL/ALL) ALL/' /etc/sudoers
+    # Disable passwordless sudo (can be commented for troubleshooting)
+    # sudo sed -i '/ronindojo/s/ALL) NOPASSWD:ALL/ALL) ALL/' /etc/sudoers
     touch "$HOME"/.logs/setup-complete    
 fi
