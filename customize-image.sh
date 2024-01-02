@@ -215,6 +215,7 @@ _rand_passwd() {
 # Install Ronin UI. This function is the same we utilize in the RoninDojo repo. Only modifying slightly since this runs during build and not organic setup.
 _install_ronin_ui(){
 
+    echo "Installing Ronin-UI"
     roninui_version_file="https://ronindojo.io/downloads/RoninUI/version.json"
 
     gui_api=$(_rand_passwd 69)
@@ -222,6 +223,7 @@ _install_ronin_ui(){
 
     cd /home/ronindojo || exit
 
+    echo "Installing Ronin-UI : pnpm"
     npm i -g pnpm@7 #&>/dev/null
 
     test -d /home/ronindojo/Ronin-UI || mkdir /home/ronindojo/Ronin-UI
