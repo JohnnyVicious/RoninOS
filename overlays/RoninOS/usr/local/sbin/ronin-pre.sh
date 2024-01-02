@@ -29,7 +29,38 @@ sleep 75s
 # Noticed the SSH service sometimes fails during boot-up, retry after sleep, maybe network init related?
 systemctl is-active --quiet ssh.service || (echo "SSH not started, trying to start..."; systemctl start ssh.service)
 
-echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NEWHOSTNAME"
+echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NEWHOSTNAME or an incremented variation..."
+# Function to check if a hostname is resolvable and not just pointing to 127.0.0.1
+is_hostname_resolvable() {
+    # Use nslookup to check if the hostname resolves to a non-loopback address
+    local resolved_ip
+    resolved_ip=$(nslookup "$1" 2>/dev/null | grep -v "127.0.0.1" | grep 'Address' | awk '{print $2}' | tail -n1)
+    
+    if [ -z "$resolved_ip" ] || [ "$resolved_ip" = "127.0.0.1" ]; then
+        return 1 # Not resolvable or resolves to loopback
+    else
+        return 0 # Resolvable to a non-loopback address
+    fi
+}
+
+# Check if the initial hostname resolves to a non-loopback address
+if is_hostname_resolvable "$NEWHOSTNAME"; then
+    # Find a unique hostname
+    suffix=0
+    original_hostname=$NEWHOSTNAME
+    while is_hostname_resolvable "$NEWHOSTNAME"; do
+        ((suffix++))
+        if [[ $suffix -gt 99 ]]; then
+            echo "Error: Reached suffix limit without finding a unique hostname."
+            Exit 1;
+        fi
+        NEWHOSTNAME="${original_hostname}$(printf "%02d" $suffix)"
+    done
+else
+    echo "Current hostname '$NEWHOSTNAME' is not resolvable or resolves to 127.0.0.1. Keeping it unchanged."
+fi
+
+echo "Unique hostname determined: $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; exit 1;)
 echo "127.0.0.1 $(hostname)" | tee -a /etc/hosts # Make hostname resolvable to loopback address
