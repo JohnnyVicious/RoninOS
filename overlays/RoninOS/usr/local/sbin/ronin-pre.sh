@@ -11,10 +11,10 @@ RONINUSER="ronindojo"
 
 # This service always starts when ronin-setup.service does
 
-# Needed for ronin-setup.service that runs as ronindojo user
+# Needed for ronin-setup.service that runs as ronindojo user, making sure
 chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
-[ -f /home/ronindojo/.logs/presetup-complete ] && (echo "Pre-setup has already run, disabling service"; exit 0;)
+[ -f /home/ronindojo/.logs/presetup-complete ] && (echo "Pre-setup has already run."; exit 0;)
 
 echo "Enable passwordless sudo for $RONINUSER"
 grep -q "${RONINUSER}.*NOPASSWD:ALL" /etc/sudoers || sed -i "/${RONINUSER}/s/ALL) ALL/ALL) NOPASSWD:ALL/" /etc/sudoers
