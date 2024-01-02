@@ -73,9 +73,9 @@ echo "Set and store the random passwords if config.json does not already exist"
 if [ ! -f /home/"${RONINUSER}"/.config/RoninDojo/config.json ]; then
 # Generate random 21 char alphanumeric passwords for root and $RONINUSER
     #PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
-    PASSWORD="Ronindojo369" # Not entirely sure setting a random password for ronindojo is necessary before the final application install, makes troubleshooting a new build impossible
+    PASSWORD="Ronindojo369" # Not entirely sure setting a random password for ronindojo is necessary before the final application install, makes troubleshooting a new build impossible?
     ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
-    echo "Adding the random generated passwords to info.json, $RONINUSER:$PASSWORD"
+    echo "Adding these passwords to info.json, $RONINUSER will be asked to change password $PASSWORD on first logon of Ronin-UI."
     mkdir -p /home/"${RONINUSER}"/.config/RoninDojo
     chpasswd <<<"root:$ROOTPASSWORD"
     chpasswd <<<"$RONINUSER:$PASSWORD"
