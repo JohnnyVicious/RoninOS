@@ -17,7 +17,7 @@ TMPDIR=/var/tmp
 RONINUSER="ronindojo"
 # Setting a random password for the users is necessary before the final application install, makes troubleshooting a new build impossible
 PASSWORD="Ronindojo369"
-ROOTPASSWORD="Ronindojo369"
+ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c'21')"
 FULLNAME="RoninDojo"
 TIMEZONE="UTC"
 LOCALE="en_US.UTF-8"
@@ -374,7 +374,8 @@ main(){
 	chmod +x /usr/local/sbin/*.sh
         systemctl enable oem-boot.service
 	_service_checks # Armbian confirmed
- 	apt-get upgrade && apt-get upgrade -y
+ 	# apt-get upgrade && apt-get upgrade -y
+  	chown -R "${RONINUSER}":"${RONINUSER}" /home/"${RONINUSER}"
         echo "Setup is complete"
     fi
 }
