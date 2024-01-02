@@ -141,7 +141,7 @@ _service_checks(){
     fi
 
     if ! systemctl is-enabled ronin-setup.service; then
-        # Changed: service will get enabled after the ronin-pre.service ran
+        # Changed: service will get enabled after the ronin-pre.service ran succesfully
 	systemctl disable ronin-setup.service
     fi
 
@@ -367,8 +367,8 @@ main(){
         _create_oem_install
         _prep_install
         _prep_tor
-        # Changed: group pm2 does not exist (Armbian build)
-	# usermod -aG pm2 ronindojo        
+        # group pm2 does not exist (Armbian build)
+	usermod -aG pm2 ronindojo        
 	mkdir -p /usr/share/nginx/logs
         rm -rf /etc/nginx/sites-enabled/default        
 	_install_ronin_ui
@@ -376,7 +376,7 @@ main(){
 	chmod +x /usr/local/sbin/*.sh
         systemctl enable oem-boot.service
 	_service_checks # Armbian confirmed
- 	apt-get upgrade && apt-get upgrade -y
+ 	apt-get update && apt-get upgrade -y
   	chown -R "${RONINUSER}":"${RONINUSER}" /home/"${RONINUSER}"
         echo "Setup is complete"
     fi
