@@ -222,7 +222,7 @@ _install_ronin_ui(){
 
     cd /home/ronindojo || exit
 
-    npm i -g pnpm@7 &>/dev/null
+    npm i -g pnpm@7 #&>/dev/null
 
     test -d /home/ronindojo/Ronin-UI || mkdir /home/ronindojo/Ronin-UI
     cd /home/ronindojo/Ronin-UI || exit
