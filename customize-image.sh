@@ -171,7 +171,7 @@ _prep_install(){
     curl -L https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-"$ARCHITECTURE" -o /usr/bin/docker-compose
     chmod +x /usr/bin/docker-compose
 
-    echo "Installing pm2"
+    echo "Installing pm2" (does not work on Armbian build)
     npm install pm2 -g
 }
 
@@ -223,8 +223,8 @@ _install_ronin_ui(){
 
     cd /home/ronindojo || exit
 
-    echo "Installing Ronin-UI : pnpm"
-    npm i -g pnpm@7 #&>/dev/null
+    echo "Installing Ronin-UI : pnpm" (does not work on Armbian build)
+    npm i -g pnpm@7
 
     test -d /home/ronindojo/Ronin-UI || mkdir /home/ronindojo/Ronin-UI
     cd /home/ronindojo/Ronin-UI || exit
@@ -260,7 +260,7 @@ _install_ronin_ui(){
 
     _ronin_ui_avahi_service
 
-    chown -R ronindojo:ronindojo /home/ronindojo/Ronin-UI
+    chown -R $RONINUSER:$RONINUSER /home/"$RONINUSER"/Ronin-UI
 }
 
 # The debian default was incompatible with our setup. This sets tor to match RoninDojo requirements and removes the debian variants.
