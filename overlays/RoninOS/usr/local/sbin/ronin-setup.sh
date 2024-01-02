@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo "RoninDojo IP : $(ip addr show | grep -E '^\s*inet\b' | grep -Ev '127\.0\.0\.1|inet6' | grep -E 'eth|wlan' | awk '{print $2}' | cut -d'/' -f1)"
-echo "RoninDojo Model : $(tr -d '\0' < /proc/device-tree/model)"
+echo "RoninDojo IP : $(ip addr show | grep -E '^\s*inet\b' | grep -Ev '127\.0\.0\.1|inet6' | grep -E 'eth|wlan' | awk '{print $2}' | cut -d'/' -f1)" || echo "Something went wrong when getting the IP address."
+echo "RoninDojo Model : $(tr -d '\0' < /proc/device-tree/model)" || echo "Something went wrong when getting the board model."
 
 # This service will run as the $USER, passwordless sudo should have been set at this point
 echo "Check if passwordless sudo is enabled for user $USER"  
@@ -55,7 +55,11 @@ if _main; then
     if ! systemctl is-active pm2-ronindojo.service; then
         sudo systemctl start pm2-ronindojo.service
     fi    
+    
+    # Disable setup services    
     sudo systemctl disable ronin-setup.service            
+    sudo systemctl disable --now ronin-pre.service
+    
     # Disable passwordless sudo
     sudo sed -i '/ronindojo/s/ALL) NOPASSWD:ALL/ALL) ALL/' /etc/sudoers
     touch "$HOME"/.logs/setup-complete    
