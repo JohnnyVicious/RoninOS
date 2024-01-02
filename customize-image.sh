@@ -223,7 +223,7 @@ _install_ronin_ui(){
 
     cd /home/ronindojo || exit
 
-    echo "Installing Ronin-UI : pnpm" (does not work on Armbian build)
+    echo "Installing Ronin-UI : pnpm" # (does not work on Armbian build)
     npm i -g pnpm@7
 
     test -d /home/ronindojo/Ronin-UI || mkdir /home/ronindojo/Ronin-UI
