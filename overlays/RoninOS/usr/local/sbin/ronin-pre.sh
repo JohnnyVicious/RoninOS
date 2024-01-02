@@ -90,6 +90,22 @@ $GENERATE_MESSAGE
 Date and Time: $TIMESTAMP
 EOF
     chown -R "$RONINUSER":"$RONINUSER" /home/"${RONINUSER}"/.config/RoninDojo
+
+else
+    echo "The config file info.json already exists."
+
+    # Verifying root password from info.json
+    ROOTPASSWORD_STORED=$(jq -r '.user[] | select(.name=="root") | .password' /home/"${RONINUSER}"/.config/RoninDojo/info.json)
+    # Attempt a command with the root password
+    echo "$ROOTPASSWORD_STORED" | sudo -S ls /root >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo "Verifying root password from info.json : root password is valid."
+    else
+        echo "Verifying root password from info.json : root password $ROOTPASSWORD_STORED is invalid!"
+        echo "Changing root password to $ROOTPASSWORD for troubleshooting"
+        chpasswd <<<"root:$ROOTPASSWORD"
+        Exit 1;
+    fi
 fi # end of config.json
 
 echo "Check if the .logs folder exists, if not create and initiate logfiles"
@@ -97,7 +113,7 @@ echo "Check if the .logs folder exists, if not create and initiate logfiles"
 
 echo "Installing NPM packages"
 apt install -y npm
-npm i -g pnpm@7
+npm i -g pnpm #@7 # commented the explicit version
 npm install pm2 -g
 usermod -aG pm2 ronindojo
 
