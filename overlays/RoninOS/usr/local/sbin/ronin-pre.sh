@@ -9,16 +9,17 @@ fi
 NEWHOSTNAME="RoninDojo"
 RONINUSER="ronindojo"
 
-# This service also starts when ronin-setup.service gets invoked, making sure this is always executed even if pre-setup already ran
-echo "Enable passwordless sudo for $RONINUSER"
-grep -q "${RONINUSER}.*NOPASSWD:ALL" /etc/sudoers || sed -i "/${RONINUSER}/s/ALL) ALL/ALL) NOPASSWD:ALL/" /etc/sudoers
+# This service always starts when ronin-setup.service does
 
 # Needed for ronin-setup.service that runs as ronindojo user
 chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
-[ -f /home/ronindojo/.logs/presetup-complete ] && (echo "Pre-setup has already run, disabling service"; systemctl disable --now ronin-pre.service; exit 0;)
+[ -f /home/ronindojo/.logs/presetup-complete ] && (echo "Pre-setup has already run, disabling service"; exit 0;)
 
-# ronin-setup.service starts at the same time during boot-up, making sure it is disabled before the wait
+echo "Enable passwordless sudo for $RONINUSER"
+grep -q "${RONINUSER}.*NOPASSWD:ALL" /etc/sudoers || sed -i "/${RONINUSER}/s/ALL) ALL/ALL) NOPASSWD:ALL/" /etc/sudoers
+
+# ronin-setup.service starts at the same time during boot-up, making sure it is disabled before the wait to avoid conflicts
 echo "Making sure the ronin-setup.service is disabled"
 systemctl is-enabled --quiet ronin-setup.service && (echo "ronin-setup.service was still enabled, stopping and disabling..."; systemctl disable --now ronin-setup.service)
 
