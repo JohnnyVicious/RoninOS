@@ -111,6 +111,9 @@ fi # end of config.json
 echo "Check if the .logs folder exists, if not create and initiate logfiles"
 [ ! -d /home/ronindojo/.logs ] && mkdir -p /home/ronindojo/.logs && touch /home/ronindojo/.logs/{setup.logs,pre-setup.logs,post.logs}
 
+echo "Checking nodejs version : $(node -v), making sure this doesn't get upgraded"
+apt-mark hold nodejs
+
 echo "Installing NPM packages"
 apt install -y npm
 npm install -g npm@8
