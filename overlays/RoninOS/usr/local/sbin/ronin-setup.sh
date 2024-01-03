@@ -47,6 +47,7 @@ if _main; then
     echo "Checking npm version : $(npm -v)"    
     echo "Checking pnpm version : $(pnpm -v)"
     echo "Checking pm2 version : $(pm2 -v)"
+    sleep 30s
 
     # Run system setup
     Scripts/Install/install-system-setup.sh system
@@ -70,9 +71,9 @@ if _main; then
     # sudo sed -i '/ronindojo/s/ALL) NOPASSWD:ALL/ALL) ALL/' /etc/sudoers
     touch "$HOME"/.logs/setup-complete    
     
-    echo "Checking nodejs version : $(node -v)"
-    echo "Checking npm version : $(npm -v)"    
-    echo "Checking pnpm version : $(pnpm -v)"
-    echo "Checking pm2 version : $(pm2 -v)"
-    sleep 10s
+    echo "[FINAL] Checking nodejs version : $(node -v)"
+    echo "[FINAL] Checking npm version : $(npm -v)"    
+    echo "[FINAL] Checking pnpm version : $(pnpm -v)"
+    echo "[FINAL] Checking pm2 version : $(pm2 -v)"
+    sleep 30s
 fi
