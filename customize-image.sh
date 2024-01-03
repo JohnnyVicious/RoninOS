@@ -152,11 +152,18 @@ _service_checks(){
 
 _prep_install(){
     echo "Installing Nodejs"
-    curl -sL https://deb.nodesource.com/setup_16.x | bash -
-    apt-get update
-    apt-get install -y nodejs
-    apt-mark hold nodejs
-    node -v
+    #curl -sL https://deb.nodesource.com/setup_16.x | bash -
+    #apt-get update
+    #apt-get install -y nodejs
+
+    apt purge -y --autoremove nodejs npm
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+    source ~/.bashrc
+    nvm -v
+    nvm install 16
+    nvm use 16
+    nvm alias default 16
+    node -v    
 
     echo "Installing Docker on $DISTRO release $RELEASE"
     mkdir -m 0755 -p /etc/apt/keyrings
@@ -174,7 +181,7 @@ _prep_install(){
     chmod +x /usr/bin/docker-compose
 
     echo "Installing pm2" #(does not work on Armbian build)
-    npm install pm2 -g
+    npm i pm2 -g
 }
 
 _ronin_ui_avahi_service() {
@@ -370,7 +377,7 @@ main(){
         _prep_install
         _prep_tor
         # group pm2 does not exist (Armbian build)
-	usermod -aG pm2 ronindojo        
+	# usermod -aG pm2 ronindojo        
 	mkdir -p /usr/share/nginx/logs
         rm -rf /etc/nginx/sites-enabled/default        
 	_install_ronin_ui
