@@ -42,6 +42,12 @@ cd "$HOME"/RoninDojo || exit 1;
 
 # Run main
 if _main; then    
+
+    echo "Checking nodejs version : $(node -v)"
+    echo "Checking npm version : $(npm -v)"    
+    echo "Checking pnpm version : $(pnpm -v)"
+    echo "Checking pm2 version : $(pm2 -v)"
+
     # Run system setup
     Scripts/Install/install-system-setup.sh system
 
@@ -63,4 +69,9 @@ if _main; then
     # Disable passwordless sudo (can be commented for troubleshooting)
     # sudo sed -i '/ronindojo/s/ALL) NOPASSWD:ALL/ALL) ALL/' /etc/sudoers
     touch "$HOME"/.logs/setup-complete    
+    
+    echo "Checking nodejs version : $(node -v)"
+    echo "Checking npm version : $(npm -v)"    
+    echo "Checking pnpm version : $(pnpm -v)"
+    echo "Checking pm2 version : $(pm2 -v)"
 fi
