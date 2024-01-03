@@ -111,6 +111,11 @@ fi # end of config.json
 echo "Check if the .logs folder exists, if not create and initiate logfiles"
 [ ! -d /home/ronindojo/.logs ] && mkdir -p /home/ronindojo/.logs && touch /home/ronindojo/.logs/{setup.logs,pre-setup.logs,post.logs}
 
+echo "[BEFORE] Checking nodejs version : $(node -v)"
+echo "[BEFORE] Checking npm version : $(npm -v)"    
+echo "[BEFORE] Checking pnpm version : $(pnpm -v)"
+echo "[BEFORE] Checking pm2 version : $(pm2 -v)"
+    
 apt purge -y --autoremove nodejs npm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 source ~/.bashrc
@@ -118,12 +123,16 @@ echo "Checking NVM version : $(nvm -v)"
 nvm install 16
 nvm use 16
 nvm alias default 16
-echo "Checking nodejs version : $(node -v)"
 
 echo "Installing NPM packages"
-npm install -g npm@8
+npm i -g npm@8
 npm i -g pnpm@7
 npm i -g pm2
+
+echo "[AFTER] Checking nodejs version : $(node -v)"
+echo "[AFTER] Checking npm version : $(npm -v)"    
+echo "[AFTER] Checking pnpm version : $(pnpm -v)"
+echo "[AFTER] Checking pm2 version : $(pm2 -v)"
 
 echo "Set the owner to $RONINUSER for the $RONINUSER home folder and all subfolders" 
 # Noticed this does not happen during the Armbian build even if it is in the customize script
