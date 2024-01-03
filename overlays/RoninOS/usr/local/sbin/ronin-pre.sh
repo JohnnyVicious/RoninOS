@@ -55,14 +55,11 @@ else
     echo "Current hostname '$NEWHOSTNAME' is not resolvable or resolves to 127.0.0.1. Keeping it unchanged."
 fi
 
-apt purge -y --autoremove nodejs npm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+apt-get purge -y --autoremove nodejs npm
 
 echo "Unique hostname determined: $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; exit 1;)
-
-nvm -v &> /dev/null || (echo "nvm installation needs a reboot in 20 seconds..." && sleep 20 && shutdown -r now)
 
 # Wait for other system services to complete
 sleep 75s
@@ -116,29 +113,6 @@ fi # end of config.json
 
 echo "Check if the .logs folder exists, if not create and initiate logfiles"
 [ ! -d /home/ronindojo/.logs ] && mkdir -p /home/ronindojo/.logs && touch /home/ronindojo/.logs/{setup.logs,pre-setup.logs,post.logs}
-
-echo "[BEFORE] Checking nodejs version : $(node -v)"
-echo "[BEFORE] Checking npm version : $(npm -v)"    
-echo "[BEFORE] Checking pnpm version : $(pnpm -v)"
-echo "[BEFORE] Checking pm2 version : $(pm2 -v)"
-    
-apt purge -y --autoremove nodejs npm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-source ~/.bashrc
-echo "Checking NVM version : $(nvm -v)"
-nvm install 16
-nvm use 16
-nvm alias default 16
-
-echo "Installing NPM packages"
-npm i -g npm@8
-npm i -g pnpm@7
-npm i -g pm2
-
-echo "[AFTER] Checking nodejs version : $(node -v)"
-echo "[AFTER] Checking npm version : $(npm -v)"    
-echo "[AFTER] Checking pnpm version : $(pnpm -v)"
-echo "[AFTER] Checking pm2 version : $(pm2 -v)"
 
 echo "Set the owner to $RONINUSER for the $RONINUSER home folder and all subfolders" 
 # Noticed this does not happen during the Armbian build even if it is in the customize script
