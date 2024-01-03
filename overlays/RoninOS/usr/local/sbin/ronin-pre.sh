@@ -111,6 +111,13 @@ fi # end of config.json
 echo "Check if the .logs folder exists, if not create and initiate logfiles"
 [ ! -d /home/ronindojo/.logs ] && mkdir -p /home/ronindojo/.logs && touch /home/ronindojo/.logs/{setup.logs,pre-setup.logs,post.logs}
 
+apt purge -y --autoremove nodejs npm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc
+echo "Checking NVM version : $(nvm -v)"
+nvm install 16
+nvm use 16
+nvm alias default 16
 echo "Checking nodejs version : $(node -v)"
 
 echo "Installing NPM packages"
