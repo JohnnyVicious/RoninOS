@@ -152,18 +152,9 @@ _service_checks(){
 
 _prep_install(){
     echo "Installing Nodejs"
-    #curl -sL https://deb.nodesource.com/setup_16.x | bash -
-    #apt-get update
-    #apt-get install -y nodejs
-
-    apt purge -y --autoremove nodejs npm
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-    source ~/.bashrc
-    nvm -v
-    nvm install 16
-    nvm use 16
-    nvm alias default 16
-    node -v    
+    curl -sL https://deb.nodesource.com/setup_16.x | bash -
+    apt-get update
+    apt-get install -y nodejs
 
     echo "Installing Docker on $DISTRO release $RELEASE"
     mkdir -m 0755 -p /etc/apt/keyrings
@@ -182,6 +173,7 @@ _prep_install(){
 
     echo "Installing pm2" #(does not work on Armbian build)
     npm i npm@8 -g
+    npm i pnpm@7 -g
     npm i pm2 -g
 }
 
