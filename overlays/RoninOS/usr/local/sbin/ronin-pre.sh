@@ -113,9 +113,9 @@ echo "Check if the .logs folder exists, if not create and initiate logfiles"
 
 echo "Installing NPM packages"
 apt install -y npm
-npm i -g pnpm #@7 # commented the explicit version
-npm install pm2 -g
-usermod -aG pm2 ronindojo
+npm install -g npm@8
+npm i -g pnpm@7
+npm i -g pm2
 
 echo "Set the owner to $RONINUSER for the $RONINUSER home folder and all subfolders" 
 # Noticed this does not happen during the Armbian build even if it is in the customize script
