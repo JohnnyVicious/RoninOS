@@ -74,4 +74,5 @@ if _main; then
     echo "Checking npm version : $(npm -v)"    
     echo "Checking pnpm version : $(pnpm -v)"
     echo "Checking pm2 version : $(pm2 -v)"
+    sleep 10s
 fi
