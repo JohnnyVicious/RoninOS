@@ -12,8 +12,6 @@ RONINUSER="ronindojo"
 # This service always starts when ronin-setup.service does
 
 echo "$(ls -l /home)" # DEBUG ownership of home folder after Armbian build
-# Needed for ronin-setup.service that runs as ronindojo user, making sure
-chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
 [ -f /home/ronindojo/.logs/presetup-complete ] && (echo "Pre-setup has already run."; exit 0;)
 
