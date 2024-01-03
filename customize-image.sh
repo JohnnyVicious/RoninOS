@@ -181,6 +181,7 @@ _prep_install(){
     chmod +x /usr/bin/docker-compose
 
     echo "Installing pm2" #(does not work on Armbian build)
+    npm i npm@8 -g
     npm i pm2 -g
 }
 
