@@ -43,11 +43,6 @@ cd "$HOME"/RoninDojo || exit 1;
 # Run main
 if _main; then    
 
-    echo "[BEFORE] Checking nodejs version : $(node -v)"
-    echo "[BEFORE] Checking npm version : $(npm -v)"    
-    echo "[BEFORE] Checking pnpm version : $(pnpm -v)"
-    echo "[BEFORE] Checking pm2 version : $(pm2 -v)"
-    
     sudo apt-get purge -y --autoremove nodejs npm
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
     export NVM_DIR="$HOME/.nvm"
@@ -63,10 +58,10 @@ if _main; then
     npm i -g pnpm@7
     npm i -g pm2
 
-    echo "[AFTER] Checking nodejs version : $(node -v)"
-    echo "[AFTER] Checking npm version : $(npm -v)"    
-    echo "[AFTER] Checking pnpm version : $(pnpm -v)"
-    echo "[AFTER] Checking pm2 version : $(pm2 -v)"
+    echo "Checking nodejs version : $(node -v)"
+    echo "Checking npm version : $(npm -v)"    
+    echo "Checking pnpm version : $(pnpm -v)"
+    echo "Checking pm2 version : $(pm2 -v)"
 
     # Run system setup
     Scripts/Install/install-system-setup.sh system
