@@ -24,12 +24,6 @@ grep -q "${RONINUSER}.*NOPASSWD:ALL" /etc/sudoers || sed -i "/${RONINUSER}/s/ALL
 echo "Making sure the ronin-setup.service is disabled"
 systemctl is-enabled --quiet ronin-setup.service && (echo "ronin-setup.service was still enabled, stopping and disabling..."; systemctl disable --now ronin-setup.service)
 
-# Wait for other system services to complete
-sleep 75s
-
-# Noticed the SSH service sometimes fails during boot-up, retry after sleep, maybe network init related?
-systemctl is-active --quiet ssh.service || (echo "SSH not started, trying to start..."; systemctl start ssh.service)
-
 echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NEWHOSTNAME or an incremented variation..."
 # Function to check if a hostname is resolvable and not just pointing to 127.0.0.1
 is_hostname_resolvable() {
@@ -61,10 +55,22 @@ else
     echo "Current hostname '$NEWHOSTNAME' is not resolvable or resolves to 127.0.0.1. Keeping it unchanged."
 fi
 
+apt purge -y --autoremove nodejs npm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
 echo "Unique hostname determined: $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; exit 1;)
-echo "127.0.0.1 $(hostname)" | tee -a /etc/hosts # Make hostname resolvable to loopback address
+
+nvm -v &> /dev/null || (echo "nvm installation needs a reboot in 20 seconds..." && sleep 20 && shutdown -r now)
+
+# Wait for other system services to complete
+sleep 75s
+
+# Noticed the SSH service sometimes fails during boot-up, retry after sleep, maybe network init related?
+systemctl is-active --quiet ssh.service || (echo "SSH not started, trying to start..."; systemctl start ssh.service)
+
+grep -q "127.0.0.1 $(hostname)" /etc/hosts || echo "127.0.0.1 $(hostname)" | sudo tee -a /etc/hosts # Make hostname resolvable to loopback address
 
 echo "Add user $RONINUSER to the docker group for sudo-less access to commands"
 usermod -aG docker "$RONINUSER"
