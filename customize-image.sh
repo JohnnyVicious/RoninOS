@@ -151,10 +151,10 @@ _service_checks(){
 }
 
 _prep_install(){
-    echo "Installing Nodejs"
-    curl -sL https://deb.nodesource.com/setup_16.x | bash -
-    apt-get update
-    apt-get install -y nodejs
+    echo "Installing Nodejs" # Commented coz moved install via NVM into ronin-setup.service
+    # curl -sL https://deb.nodesource.com/setup_16.x | bash -
+    # apt-get update
+    # apt-get install -y nodejs
 
     echo "Installing Docker on $DISTRO release $RELEASE"
     mkdir -m 0755 -p /etc/apt/keyrings
@@ -171,10 +171,10 @@ _prep_install(){
     curl -L https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-"$ARCHITECTURE" -o /usr/bin/docker-compose
     chmod +x /usr/bin/docker-compose
 
-    echo "Installing pm2" #(does not work on Armbian build)
-    npm i npm@8 -g
-    npm i pnpm@7 -g
-    npm i pm2 -g
+    echo "Installing NPM modules" #(does not work on Armbian build)
+    # npm i npm@8 -g
+    # npm i pnpm@7 -g
+    # npm i pm2 -g
 }
 
 _ronin_ui_avahi_service() {
