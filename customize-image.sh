@@ -152,14 +152,10 @@ _service_checks(){
 
 _prep_install(){
     echo "Installing Nodejs"
-    #curl -sL https://deb.nodesource.com/setup_16.x | bash -
-    #apt-get update
-    #apt-get install -y nodejs
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-    source ~/.bashrc
-    nvm install 16
-    nvm use 16
-    nvm alias default 16
+    curl -sL https://deb.nodesource.com/setup_16.x | bash -
+    apt-get update
+    apt-get install -y nodejs
+    apt-mark hold nodejs
     node -v
 
     echo "Installing Docker on $DISTRO release $RELEASE"
