@@ -54,9 +54,9 @@ if _main; then
     echo "Checking NVM version : $(nvm -v)"
 
     echo "Installing NPM packages"
-    npm i -g npm@8
-    npm i -g pnpm@7
-    npm i -g pm2
+    sudo npm i -g npm@8
+    sudo npm i -g pnpm@7
+    sudo npm i -g pm2
 
     echo "Checking nodejs version : $(node -v)"
     echo "Checking npm version : $(npm -v)"    
