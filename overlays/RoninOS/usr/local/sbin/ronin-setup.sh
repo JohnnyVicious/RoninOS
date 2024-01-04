@@ -132,7 +132,7 @@ if _main; then
     sudo systemctl disable --now ronin-pre.service
     
     # Disable passwordless sudo, can be commented while troubleshooting, need to build a warning in RoninUI to display when this is still enabled (system security & makes login possible without password)
-    # sudo sed -i '/ronindojo/s/ALL) NOPASSWD:ALL/ALL) ALL/' /etc/sudoers
+    sudo sed -i '/ronindojo/s/ALL) NOPASSWD:ALL/ALL) ALL/' /etc/sudoers
 
     # Create the setup-complete file so this service does not run twice by accident
     touch "$HOME"/.logs/setup-complete    
