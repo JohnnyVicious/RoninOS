@@ -3,7 +3,7 @@
 # Function to check for a module and echo its path
 _check_npm_module() {
     local module=$1
-    if npm list -g | grep -q "@$module@"; then
+    if npm list -g | grep -q "$module"; then
         return 0  # Success
     else
         return 1  # Failure
