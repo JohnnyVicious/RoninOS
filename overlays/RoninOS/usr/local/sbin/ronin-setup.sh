@@ -133,6 +133,12 @@ if _main; then
     
     # Disable passwordless sudo, can be commented while troubleshooting, need to build a warning in RoninUI to display when this is still enabled (system security & makes login possible without password)
     sudo sed -i '/ronindojo/s/ALL) NOPASSWD:ALL/ALL) ALL/' /etc/sudoers
+    if ! grep -q 'ronindojo.*ALL\) ALL' /etc/sudoers; then
+        echo "Error: Change not applied in /etc/sudoers"
+        _set_troubleshooting_passwords
+        exit 1
+    fi
+
 
     # Create the setup-complete file so this service does not run twice by accident
     touch "$HOME"/.logs/setup-complete    
