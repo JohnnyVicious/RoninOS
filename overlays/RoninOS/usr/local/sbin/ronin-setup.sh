@@ -14,7 +14,6 @@ _set_troubleshooting_passwords() {
     echo "Resetting psswords of $USER and root to Ronindojo369 for troubleshooting via SSH."
     sudo chpasswd <<<"$USER:Ronindojo369" 
     sudo chpasswd <<<"root:Ronindojo369"
-    exit 1
 }
 
 echo "RoninDojo IP : $(ip addr show | grep -E '^\s*inet\b' | grep -Ev '127\.0\.0\.1|inet6' | grep -E 'eth|wlan' | awk '{print $2}' | cut -d'/' -f1)" || echo "Something went wrong when getting the IP address."
@@ -55,6 +54,7 @@ if [ $? -eq 0 ]; then
 else
     echo "Verifying root password from info.json : root password $ROOTPASSWORD_STORED is invalid!"
     _set_troubleshooting_passwords
+    exit 1
 fi
 
 echo "Give time for Startup to finish before trying to clone the repo"
@@ -93,13 +93,13 @@ if _main; then
         echo "RoninUI appears to be successfully installed."    
     else
         echo "RoninUI is not running or not found, trying to correct."        
-        cd /home/ronindojo/Ronin-UI || (echo "RoninUI path not found!"; _set_troubleshooting_passwords)        
+        cd /home/ronindojo/Ronin-UI || (echo "RoninUI path not found!"; _set_troubleshooting_passwords; exit 1;)        
 
         # Validate npm modules
-        _check_npm_module npm || (echo "Module npm is missing!"; _set_troubleshooting_passwords)
-        _check_npm_module corepack || (echo "Module corepack is missing!"; _set_troubleshooting_passwords)
-        _check_npm_module pm2 || (echo "Module pm2 is missing!"; _set_troubleshooting_passwords)
-        _check_npm_module pnpm || (echo "Module pnpm is missing!"; _set_troubleshooting_passwords)
+        _check_npm_module npm || (echo "Module npm is missing!"; _set_troubleshooting_passwords; exit 1;)
+        _check_npm_module corepack || (echo "Module corepack is missing!"; _set_troubleshooting_passwords; exit 1;)
+        _check_npm_module pm2 || (echo "Module pm2 is missing!"; _set_troubleshooting_passwords; exit 1;)
+        _check_npm_module pnpm || (echo "Module pnpm is missing!"; _set_troubleshooting_passwords; exit 1;)
 
         # Validate PM2 webapp
         pm2 ls | grep -q "RoninUI" && pm2 delete "RoninUI"    
@@ -109,12 +109,12 @@ if _main; then
         sudo env PATH="$PATH:/usr/bin" "$npm_path"/node_modules/pm2/bin/pm2 startup systemd -u ronindojo --hp /home/ronindojo
         pm2 start pm2.config.js
         pm2 save
-        pm2 ls | grep -q "RoninUI.*online" || (echo "Error: PM2 instance RoninUI is still not running, something went wrong during setup!"; _set_troubleshooting_passwords)
+        pm2 ls | grep -q "RoninUI.*online" || (echo "Error: PM2 instance RoninUI is still not running, something went wrong during setup!"; _set_troubleshooting_passwords; exit 1;)
         pm2 kill
         sudo systemctl start pm2-ronindojo
     fi
 
-    # TODO: could add some checks to see if install completed succesfully
+    # TODO: could add some more checks to see if install completed succesfully, work in progress
 
     # Restore getty
     sudo systemctl start ronin-post.service
@@ -133,3 +133,5 @@ if _main; then
     touch "$HOME"/.logs/setup-complete    
     
 fi
+
+exit 0
