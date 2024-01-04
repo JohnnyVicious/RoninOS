@@ -63,6 +63,11 @@ REPO="--branch master https://code.samourai.io/ronindojo/RoninDojo.git"
 [ ! -d "$HOME"/RoninDojo ] && (echo "Cloning repo failed!"; exit 1;)
 cd "$HOME"/RoninDojo || exit 1;
 
+# Fix static node module path in function _pm2_setup()
+sed -i 's|sudo env PATH="\$PATH:/usr/bin" /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u|sudo env PATH="\$PATH:/usr/bin" "PLACEHOLDER"/node_modules/pm2/bin/pm2 startup systemd -u|' Scripts/functions.sh
+sed -i 's#PLACEHOLDER#$(npm list -g | head -1)#' Scripts/functions.sh
+#grep -q 'sudo env PATH="\$PATH:/usr/bin" "\$(npm list -g \| head -1)"/node_modules/pm2/bin/pm2 startup systemd -u' Scripts/functions.sh || { echo "Specific line not found in functions.sh"; exit 1; }
+
 # Source files for default values and generic functions
 . Scripts/defaults.sh
 . Scripts/functions.sh
@@ -106,7 +111,7 @@ if _main; then
         pm2 save 1>/dev/null        
         pm2 startup
         npm_path=$(npm list -g | head -1)
-        sudo env PATH="$PATH:/usr/bin" "$npm_path"/node_modules/pm2/bin/pm2 startup systemd -u ronindojo --hp /home/ronindojo
+        sudo env PATH="$PATH:/usr/bin" "$npm_path"/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER
         pm2 start pm2.config.js
         pm2 save
         pm2 ls | grep -q "RoninUI.*online" || (echo "Error: PM2 instance RoninUI is still not running, something went wrong during setup!"; _set_troubleshooting_passwords; exit 1;)
