@@ -152,11 +152,17 @@ _service_checks(){
 
 _prep_install(){
     echo "Installing Nodejs"
-    # Commented the v16 prereq, Bookworm is v18 in repo so if you want to maintain node v16 then you gotta use NVM on user-level
-    # Reason why you historically needed v16, is because the path changed and the RoninDojo installer does not dynamically query that path during PM2 setup [BUGFIX]
-    # curl -sL https://deb.nodesource.com/setup_16.x | bash -
-    apt-get update
-    apt-get install -y nodejs npm
+    apt-get install -y nodejs  
+    # Get the major version of the installed Node.js
+    NODE_VERSION=$(node -v | grep -oP 'v(\d+)' | grep -oP '\d+')
+
+    # If Node.js version is less than 16, run the curl command
+    if [ "$NODE_VERSION" -lt 16 ]; then
+        curl -sL https://deb.nodesource.com/setup_16.x | bash -
+        apt-get update
+        apt-get upgrade -y nodejs
+    fi    
+    apt-get install -y npm
 
     echo "Installing Docker on $DISTRO release $RELEASE"
     mkdir -m 0755 -p /etc/apt/keyrings
