@@ -24,7 +24,7 @@ systemctl is-enabled --quiet ronin-setup.service && (echo "ronin-setup.service w
 
 echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NEWHOSTNAME or an incremented variation..."
 # Function to check if a hostname is resolvable and not just pointing to 127.0.0.1
-is_hostname_resolvable() {
+_is_hostname_resolvable() {
     # Use nslookup to check if the hostname resolves to a non-loopback address
     local resolved_ip
     resolved_ip=$(nslookup "$1" 2>/dev/null | grep -v "127.0.0.1" | grep 'Address' | awk '{print $2}' | tail -n1)
@@ -38,11 +38,11 @@ is_hostname_resolvable() {
 }
 
 # Check if the initial hostname resolves to a non-loopback address
-if is_hostname_resolvable "$NEWHOSTNAME"; then
+if _is_hostname_resolvable "$NEWHOSTNAME"; then
     # Find a unique hostname
     suffix=0
     original_hostname=$NEWHOSTNAME
-    while is_hostname_resolvable "$NEWHOSTNAME"; do
+    while _is_hostname_resolvable "$NEWHOSTNAME"; do
         ((suffix++))
         if [[ $suffix -gt 99 ]]; then
             echo "Error: Reached suffix limit without finding a unique hostname."
@@ -55,24 +55,48 @@ else
 fi
 
 # Disable ipv6
-if [ ! -f /etc/sysctl.d/40-ipv6.conf ]; then
-        tee "/etc/sysctl.d/40-ipv6.conf" <<EOF >/dev/null
-# Disable IPV6
-net.ipv6.conf.all.disable_ipv6 = 1
-EOF
-fi
+_check_sysctl_availability() {
+    # Check if sysctl command exists
+    if ! type sysctl &> /dev/null; then
+        echo "sysctl command not found"
+        return 1
+    fi
 
-# Check to see if ipv6 stack available and if so
-# restart sysctl service
-if [ -d /proc/sys/net/ipv6 ]; then
-    systemctl restart --quiet systemd-sysctl
+    # Check if sysctl configuration directory or file exists
+    if [ ! -f /etc/sysctl.conf ] && [ ! -d /etc/sysctl.d/ ]; then
+        echo "sysctl configuration not found"
+        return 1
+    fi
+
+    return 0
+}
+
+_disable_ipv6() {
+    # Apply sysctl changes to disable IPv6
+    if [ ! -f /etc/sysctl.d/40-ipv6.conf ]; then
+        echo "Disabling IPv6..."
+        echo -e "# Disable IPV6\nnet.ipv6.conf.all.disable_ipv6 = 1" | sudo tee /etc/sysctl.d/40-ipv6.conf >/dev/null
+        # Reload sysctl configurations
+        sudo sysctl -p /etc/sysctl.d/40-ipv6.conf
+        [ -d /proc/sys/net/ipv6 ] && systemctl restart --quiet systemd-sysctl
+    else
+        echo "IPv6 already disabled."
+    fi
+}
+
+# Perform sysctl checks
+if _check_sysctl_availability; then
+    _disable_ipv6
+else
+    echo "Cannot disable IPv6 due to missing sysctl requirements, running on unsupported distro!"
+    exit 1
 fi
 
 echo "Unique hostname determined: $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; exit 1;)
 
-ip a | grep -q inet6 && echo "Error: IPv6 address found"
+ip a | grep -q inet6 && echo "Error: IPv6 address found! $(ip a | grep -q inet6)"
 
 # Wait for other system services to complete
 sleep 75s
