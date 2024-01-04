@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Function to check for a module and echo its path
+_check_npm_module() {
+    local module=$1
+    if npm list -g | grep -q "@$module@"; then
+        return 0  # Success
+    else
+        return 1  # Failure
+    fi
+}
+
+_set_troubleshooting_passwords() {
+    sudo chpasswd
+}
+
 echo "RoninDojo IP : $(ip addr show | grep -E '^\s*inet\b' | grep -Ev '127\.0\.0\.1|inet6' | grep -E 'eth|wlan' | awk '{print $2}' | cut -d'/' -f1)" || echo "Something went wrong when getting the IP address."
 echo "RoninDojo Model : $(tr -d '\0' < /proc/device-tree/model)" || echo "Something went wrong when getting the board model."
 
@@ -59,6 +73,33 @@ if _main; then
     # Run RoninDojo install
     Scripts/Install/install-dojo.sh dojo
 
+    # PM2 installation can fail since path for PM2 is static in function _ronin_ui_install
+    # Check if RoninUI is in the list of PM2 processes and is online
+    if pm2 ls | grep -q "RoninUI.*online"; then
+        echo "RoninUI appears to be successfully installed."    
+    else
+        echo "RoninUI is not running or not found, trying to correct."        
+        cd /home/ronindojo/Ronin-UI || (echo "RoninUI path not found!"; _set_troubleshooting_passwords; exit 1)        
+
+        # Validate npm modules
+        _check_npm_module npm || (echo "Module npm is missing!"; _set_troubleshooting_passwords; exit 1)
+        _check_npm_module corepack || (echo "Module corepack is missing!"; _set_troubleshooting_passwords; exit 1)
+        _check_npm_module pm2 || (echo "Module pm2 is missing!"; _set_troubleshooting_passwords; exit 1)
+        _check_npm_module pnpm || (echo "Module pnpm is missing!"; _set_troubleshooting_passwords; exit 1)
+
+        # Validate PM2 webapp
+        pm2 ls | grep -q "RoninUI" && pm2 delete "RoninUI"    
+        pm2 save 1>/dev/null        
+        pm2 startup
+        npm_path=$(npm list -g | head -1)
+        sudo env PATH="$PATH:/usr/bin" "$npm_path"/node_modules/pm2/bin/pm2 startup systemd -u ronindojo --hp /home/ronindojo
+        pm2 start pm2.config.js
+        pm2 save
+        pm2 ls | grep -q "RoninUI.*online" || (echo "Error: PM2 instance RoninUI is still not running, something went wrong during setup!"; exit 1)
+        pm2 kill
+        sudo systemctl start pm2-ronindojo
+    fi
+
     # TODO: could add some checks to see if install completed succesfully
 
     # Restore getty
@@ -71,13 +112,10 @@ if _main; then
     sudo systemctl disable ronin-setup.service            
     sudo systemctl disable --now ronin-pre.service
     
-    # Disable passwordless sudo (can be commented for troubleshooting)
+    # Disable passwordless sudo, can be commented while troubleshooting, need to build a warning in RoninUI to display when this is still enabled (system security & makes login possible without password)
     # sudo sed -i '/ronindojo/s/ALL) NOPASSWD:ALL/ALL) ALL/' /etc/sudoers
+
+    # Create the setup-complete file so this service does not run twice by accident
     touch "$HOME"/.logs/setup-complete    
     
-    echo "[FINAL] Checking nodejs version : $(node -v)"
-    echo "[FINAL] Checking npm version : $(npm -v)"    
-    echo "[FINAL] Checking pnpm version : $(pnpm -v)"
-    echo "[FINAL] Checking pm2 version : $(pm2 -v)"
-    sleep 30s
 fi
