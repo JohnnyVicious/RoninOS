@@ -116,9 +116,10 @@ grep -q "127.0.0.1 $(hostname)" /etc/hosts || echo "127.0.0.1 $(hostname)" | sud
 echo "Add user $RONINUSER to the docker group for sudo-less access to commands"
 usermod -aG docker "$RONINUSER"
 
-echo "Set and store the random passwords if config.json does not already exist"
+echo "Set and store the random passwords in config.json"
+[ -f "/home/${RONINUSER}/.config/RoninDojo/info.json" ] && rm -rf "/home/${RONINUSER}/.config/RoninDojo/info.json"
 if [ ! -f /home/"${RONINUSER}"/.config/RoninDojo/config.json ]; then
-# Generate random 21 char alphanumeric passwords for root and $RONINUSER
+    # Generate random 21 char alphanumeric passwords for root and $RONINUSER
     PASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
     ROOTPASSWORD="$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 21)"
     echo "Adding these passwords to info.json, $RONINUSER will be asked to change password on first logon of Ronin-UI."
@@ -137,20 +138,6 @@ Date and Time: $TIMESTAMP
 EOF
     chown -R "$RONINUSER":"$RONINUSER" /home/"${RONINUSER}"/.config/RoninDojo
 
-else
-    echo "The config file info.json already exists."
-
-    # Verifying root password from info.json
-    ROOTPASSWORD_STORED=$(jq -r '.user[] | select(.name=="root") | .password' /home/"${RONINUSER}"/.config/RoninDojo/info.json)
-    # Attempt a command with the root password
-    echo "$ROOTPASSWORD_STORED" | sudo -S ls /root >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        echo "Verifying root password from info.json : root password is valid."
-    else
-        echo "Verifying root password from info.json : root password $ROOTPASSWORD_STORED is invalid!"
-        _set_troubleshooting_passwords
-        exit 1
-    fi
 fi # end of config.json
 
 echo "Check if the .logs folder exists, if not create and initiate logfiles"
