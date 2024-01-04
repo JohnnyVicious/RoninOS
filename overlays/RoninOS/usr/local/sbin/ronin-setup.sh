@@ -11,9 +11,8 @@ _check_npm_module() {
 }
 
 _set_troubleshooting_passwords() {
-    echo "Resetting psswords of $USER and root to Ronindojo369 for troubleshooting via SSH."
+    echo "Resetting psswords of $USER to Ronindojo369 for troubleshooting via SSH."
     sudo chpasswd <<<"$USER:Ronindojo369" 
-    sudo chpasswd <<<"root:Ronindojo369"
 }
 
 echo "RoninDojo IP : $(ip addr show | grep -E '^\s*inet\b' | grep -Ev '127\.0\.0\.1|inet6' | grep -E 'eth|wlan' | awk '{print $2}' | cut -d'/' -f1)" || echo "Something went wrong when getting the IP address."
