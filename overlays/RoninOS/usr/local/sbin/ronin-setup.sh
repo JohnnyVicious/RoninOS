@@ -66,7 +66,7 @@ cd "$HOME"/RoninDojo || exit 1;
 # Fix static node module path in function _pm2_setup()
 sed -i 's|sudo env PATH="\$PATH:/usr/bin" /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u|sudo env PATH="\$PATH:/usr/bin" "PLACEHOLDER"/node_modules/pm2/bin/pm2 startup systemd -u|' Scripts/functions.sh
 sed -i 's#PLACEHOLDER#$(npm list -g | head -1)#' Scripts/functions.sh
-#grep -q 'sudo env PATH="\$PATH:/usr/bin" "\$(npm list -g \| head -1)"/node_modules/pm2/bin/pm2 startup systemd -u' Scripts/functions.sh || { echo "Specific line not found in functions.sh"; exit 1; }
+grep 'sudo env PATH="$PATH:/usr/bin" "$(npm list -g | head -1)"/node_modules/pm2/bin/pm2 startup systemd -u' Scripts/functions.sh || { echo "Specific line not found in functions.sh"; _set_troubleshooting_passwords; exit 1; }
 
 # Source files for default values and generic functions
 . Scripts/defaults.sh
