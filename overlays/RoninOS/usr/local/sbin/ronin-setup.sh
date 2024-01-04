@@ -72,9 +72,10 @@ cd "$HOME"/RoninDojo || exit 1;
 if _main; then    
 
     echo "Installing NPM packages"
-    sudo npm i -g npm@8
-    sudo npm i -g pnpm@7
-    sudo npm i -g pm2
+    sudo npm i -g corepack --force
+    sudo npm i -g npm@8 --force
+    sudo npm i -g pnpm@7 --force
+    sudo npm i -g pm2 --force
 
     echo "Checking nodejs version : $(node -v)"
     echo "Checking npm version : $(npm -v)"    
