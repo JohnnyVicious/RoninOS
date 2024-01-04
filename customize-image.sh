@@ -101,7 +101,7 @@ EOF
     # Not sure what the (security) motivation is for this, commented because home routers often use .local (FEEDBACK)
     # echo -e "domain .local\nnameserver 1.1.1.1\nnameserver 1.0.0.1" >> /etc/resolv.conf
     
-    # Setup logs for outputs (does not work on Armbian build)
+    # Setup logs for outputs (does not work on Armbian build since INCLUDE_HOME_DIR is not used)
     mkdir -p /home/ronindojo/.logs
     touch /home/ronindojo/.logs/pre-setup.logs
     touch /home/ronindojo/.logs/setup.logs
