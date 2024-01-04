@@ -53,7 +53,7 @@ if _is_hostname_resolvable "$NEWHOSTNAME"; then
         ((suffix++))
         if [[ $suffix -gt 99 ]]; then
             echo "Error: Reached suffix limit without finding a unique hostname."
-            _set_troubleshooting_password
+            _set_troubleshooting_passwords
         fi
         NEWHOSTNAME="${original_hostname}$(printf "%02d" $suffix)"
     done
@@ -96,12 +96,12 @@ if _check_sysctl_availability; then
     _disable_ipv6
 else
     echo "Cannot disable IPv6 due to missing sysctl requirements, running on unsupported distro!"
-    _set_troubleshooting_password
+    _set_troubleshooting_passwords
 fi
 
 echo "Unique hostname determined: $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
-[ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; _set_troubleshooting_password;)
+[ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; _set_troubleshooting_passwords;)
 
 ip a | grep -q inet6 && echo "Error: IPv6 address found! $(ip a | grep -q inet6)"
 
@@ -148,7 +148,7 @@ else
         echo "Verifying root password from info.json : root password is valid."
     else
         echo "Verifying root password from info.json : root password $ROOTPASSWORD_STORED is invalid!"
-        _set_troubleshooting_password
+        _set_troubleshooting_passwords
     fi
 fi # end of config.json
 
@@ -163,7 +163,7 @@ chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 apt-get update && apt-get upgrade -y
 
 echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $RONINUSER password for troubleshooting and exit"
-[ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created, halting setup process!"; _set_troubleshooting_password;)
+[ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created, halting setup process!"; _set_troubleshooting_passwords;)
 
 # DEBUG info
 echo "Checking nodejs version : $(node -v)"
