@@ -159,8 +159,8 @@ _prep_install(){
     # If Node.js version is less than 16, run the curl command
     if [ "$NODE_VERSION" -lt 16 ]; then
         curl -sL https://deb.nodesource.com/setup_16.x | bash -
-        apt-get update
-        apt-get upgrade -y nodejs
+	apt-get update # not really needed
+        apt-get install -y nodejs
     fi    
     apt-get install -y npm
 
