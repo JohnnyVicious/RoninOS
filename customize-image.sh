@@ -151,10 +151,12 @@ _service_checks(){
 }
 
 _prep_install(){
-    echo "Installing Nodejs" # Commented coz moved install via NVM into ronin-setup.service
+    echo "Installing Nodejs"
+    # Commented the v16 prereq, Bookworm is v18 in repo so if you want to maintain node v16 then you gotta use NVM on user-level
+    # Reason why you historically needed v16, is because the path changed and the RoninDojo installer does not dynamically query that path during PM2 setup [BUGFIX]
     # curl -sL https://deb.nodesource.com/setup_16.x | bash -
-    # apt-get update
-    # apt-get install -y nodejs
+    apt-get update
+    apt-get install -y nodejs npm
 
     echo "Installing Docker on $DISTRO release $RELEASE"
     mkdir -m 0755 -p /etc/apt/keyrings
@@ -171,7 +173,7 @@ _prep_install(){
     curl -L https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-"$ARCHITECTURE" -o /usr/bin/docker-compose
     chmod +x /usr/bin/docker-compose
 
-    echo "Installing NPM modules" #(does not work on Armbian build)
+    echo "Installing NPM modules" # Commented: does not work on Armbian build, setup service will install running as user
     # npm i npm@8 -g
     # npm i pnpm@7 -g
     # npm i pm2 -g
