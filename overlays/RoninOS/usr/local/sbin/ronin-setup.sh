@@ -46,6 +46,17 @@ done
 echo "Continue only if you can access the service user's home folder"
 cd "$HOME" || exit 1;
 
+# Verifying root password from info.json
+ROOTPASSWORD_STORED=$(jq -r '.user[] | select(.name=="root") | .password' /home/"${RONINUSER}"/.config/RoninDojo/info.json)
+# Attempt a command with the root password
+echo "$ROOTPASSWORD_STORED" | sudo -S ls /root >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    echo "Verifying root password from info.json : root password is valid."
+else
+    echo "Verifying root password from info.json : root password $ROOTPASSWORD_STORED is invalid!"
+    _set_troubleshooting_passwords
+fi
+
 echo "Give time for Startup to finish before trying to clone the repo"
 sleep 75s
 REPO="--branch master https://code.samourai.io/ronindojo/RoninDojo.git"
