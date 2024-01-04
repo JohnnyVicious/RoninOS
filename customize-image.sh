@@ -282,6 +282,35 @@ HiddenServicePort 80 127.0.0.1:8470\
     rm -rf /usr/lib/systemd/system/tor@* #remove unnecessary debian installed services
 }
 
+_get_systemd_unit_path() {
+    # Use systemd's 'systemctl' command to get the system unit path
+    local unit_path=$(systemctl show -p UnitPath --value)
+
+    # If UnitPath is not found, fallback to default paths
+    if [ -z "$unit_path" ]; then
+        echo "/lib/systemd/system:/usr/lib/systemd/system:/etc/systemd/system"
+    else
+        echo "$unit_path"
+    fi
+}
+
+# Dynamically check the systemd paths for a service file
+_check_service_file() {
+    local service_file=$1
+    local unit_path
+    unit_path=$(_get_systemd_unit_path)
+
+    # Check each path in the unit path for the service file
+    IFS=':' read -ra paths <<< "$unit_path"
+    for path in "${paths[@]}"; do
+        if [ -f "${path}/${service_file}" ]; then
+            return 0 # Success, file found
+        fi
+    done
+
+    return 1 # Failure, file not found
+}
+
 # This installs all required packages needed for RoninDojo. Clones the RoninOS repo so it can be copied to appropriate locations. Then runs all the functions defined above.
 main(){
     # REPO= "https://code.samourai.io/ronindojo/RoninOS.git"
@@ -305,7 +334,8 @@ main(){
         net-tools htop unzip wget ufw rsync jq python3 python3-pip
         pipenv gdisk gcc curl apparmor ca-certificates gnupg libevent-dev netcat-openbsd make
 	zlib1g-dev libssl-dev make automake autoconf musl-dev coreutils gpg
-    )    
+ 	smartmontools
+    )
 
     apt install -y lsb-release
     export DISTRO="$(lsb_release -is | tr '[:upper:]' '[:lower:]')"
@@ -360,13 +390,10 @@ main(){
     # clone the original RoninOS    
     git clone $(echo "$REPO") /tmp/RoninOS
     cp -Rv /tmp/RoninOS/overlays/RoninOS/usr/* /usr/
-    cp -Rv /tmp/RoninOS/overlays/RoninOS/etc/* /etc/    
+    cp -Rv /tmp/RoninOS/overlays/RoninOS/etc/* /etc/  
 
     # Check if the ronin-setup.service exists
-    if [ ! -f /usr/lib/systemd/system/ronin-setup.service ]; then
-        echo "ronin-setup.service is missing..."	
-        exit 1;
-    else 
+    if _check_service_file "ronin-setup.service"; then    
         echo "Setup service is PRESENT! Keep going!"
         _create_oem_install
         _prep_install
@@ -375,14 +402,17 @@ main(){
 	# usermod -aG pm2 ronindojo        
 	mkdir -p /usr/share/nginx/logs
         rm -rf /etc/nginx/sites-enabled/default        
-	_install_ronin_ui
-        usermod -aG docker ronindojo
+	_install_ronin_ui # TODO: unsure if this is usefull during build phase, gets executed by the setup service anyways
+        usermod -aG docker $RONINUSER # sudoless docker command access
 	chmod +x /usr/local/sbin/*.sh
         systemctl enable oem-boot.service
 	_service_checks # Armbian confirmed
  	apt-get update && apt-get upgrade -y
   	chown -R "${RONINUSER}":"${RONINUSER}" /home/"${RONINUSER}"
         echo "Setup is complete"
+    else
+        echo "ronin-setup.service is missing, something went wrong!"
+    	exit 1
     fi
 }
 
