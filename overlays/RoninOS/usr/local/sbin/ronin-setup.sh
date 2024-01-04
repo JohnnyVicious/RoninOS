@@ -43,16 +43,6 @@ cd "$HOME"/RoninDojo || exit 1;
 # Run main
 if _main; then    
 
-    sudo apt-get purge -y --autoremove nodejs npm
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"   
-    nvm install 16
-    nvm use 16
-    nvm alias default 16
-    echo "Checking NVM version : $(nvm -v)"
-
     echo "Installing NPM packages"
     sudo npm i -g npm@8
     sudo npm i -g pnpm@7
