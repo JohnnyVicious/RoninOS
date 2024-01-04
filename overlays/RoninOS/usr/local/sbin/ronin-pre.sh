@@ -30,6 +30,7 @@ is_hostname_resolvable() {
     resolved_ip=$(nslookup "$1" 2>/dev/null | grep -v "127.0.0.1" | grep 'Address' | awk '{print $2}' | tail -n1)
     
     if [ -z "$resolved_ip" ] || [ "$resolved_ip" = "127.0.0.1" ]; then
+        echo "$1 resolvable to loopback."
         return 1 # Not resolvable or resolves to loopback
     else
         return 0 # Resolvable to a non-loopback address
@@ -53,11 +54,25 @@ else
     echo "Current hostname '$NEWHOSTNAME' is not resolvable or resolves to 127.0.0.1. Keeping it unchanged."
 fi
 
-apt-get purge -y --autoremove nodejs npm
+# Disable ipv6
+if [ ! -f /etc/sysctl.d/40-ipv6.conf ]; then
+        tee "/etc/sysctl.d/40-ipv6.conf" <<EOF >/dev/null
+# Disable IPV6
+net.ipv6.conf.all.disable_ipv6 = 1
+EOF
+fi
+
+# Check to see if ipv6 stack available and if so
+# restart sysctl service
+if [ -d /proc/sys/net/ipv6 ]; then
+    systemctl restart --quiet systemd-sysctl
+fi
 
 echo "Unique hostname determined: $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; exit 1;)
+
+ip a | grep -q inet6 && echo "Error: IPv6 address found"
 
 # Wait for other system services to complete
 sleep 75s
@@ -113,14 +128,18 @@ echo "Check if the .logs folder exists, if not create and initiate logfiles"
 [ ! -d /home/ronindojo/.logs ] && mkdir -p /home/ronindojo/.logs && touch /home/ronindojo/.logs/{setup.logs,pre-setup.logs,post.logs}
 
 echo "Set the owner to $RONINUSER for the $RONINUSER home folder and all subfolders" 
-# Noticed this does not happen during the Armbian build even if it is in the customize script
-# Needed for ronin-setup.service that runs as ronindojo user, second time after all has been executed since this runs as root and that will be the owner of new files
+# Noticed this can't work during the Armbian build process since that is running as root
+# Needed for ronin-setup.service that runs as $RONINUSER user
 chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 
 apt-get update && apt-get upgrade -y
 
 echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $RONINUSER password for troubleshooting and exit"
-[ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created!"; chpasswd <<<"$RONINUSER:Ronindojo369"; exit 1;)
+[ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created, halting setup process!"; chpasswd <<<"$RONINUSER:Ronindojo369"; chpasswd <<<"root:Ronindojo369"; exit 1;)
+
+# DEBUG info
+echo "Checking nodejs version : $(node -v)"
+echo "Checking npm version : $(npm -v)"    
 
 echo "Enabling the RoninDojo setup service after everything has been validated"
 touch /home/ronindojo/.logs/presetup-complete
