@@ -13,7 +13,6 @@ _set_troubleshooting_passwords() {
     echo "Resetting psswords of $RONINUSER and root to Ronindojo369 for troubleshooting via SSH."
     chpasswd <<<"$RONINUSER:Ronindojo369" 
     chpasswd <<<"root:Ronindojo369"
-    exit 1
 }
 
 # This service always starts when ronin-setup.service does
@@ -54,6 +53,7 @@ if _is_hostname_resolvable "$NEWHOSTNAME"; then
         if [[ $suffix -gt 99 ]]; then
             echo "Error: Reached suffix limit without finding a unique hostname."
             _set_troubleshooting_passwords
+            exit 1
         fi
         NEWHOSTNAME="${original_hostname}$(printf "%02d" $suffix)"
     done
@@ -97,11 +97,12 @@ if _check_sysctl_availability; then
 else
     echo "Cannot disable IPv6 due to missing sysctl requirements, running on unsupported distro!"
     _set_troubleshooting_passwords
+    exit 1
 fi
 
 echo "Unique hostname determined: $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
-[ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; _set_troubleshooting_passwords;)
+[ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; _set_troubleshooting_passwords; exit 1;)
 
 ip a | grep -q inet6 && echo "Error: IPv6 address found! $(ip a | grep -q inet6)"
 
@@ -149,6 +150,7 @@ else
     else
         echo "Verifying root password from info.json : root password $ROOTPASSWORD_STORED is invalid!"
         _set_troubleshooting_passwords
+        exit 1
     fi
 fi # end of config.json
 
@@ -163,7 +165,7 @@ chown -R "$RONINUSER":"$RONINUSER" /home/"$RONINUSER"
 apt-get update && apt-get upgrade -y
 
 echo "Check if pre-reqs for the ronin-setup.service are fulfilled, if not set default $RONINUSER password for troubleshooting and exit"
-[ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created, halting setup process!"; _set_troubleshooting_passwords;)
+[ ! -f /home/"${RONINUSER}"/.config/RoninDojo/info.json ] && (echo "info.json has not been created, halting setup process!"; _set_troubleshooting_passwords; exit 1;)
 
 # DEBUG info
 echo "Checking nodejs version : $(node -v)"
