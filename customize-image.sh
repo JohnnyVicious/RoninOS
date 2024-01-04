@@ -45,7 +45,8 @@ _create_oem_install() {
     # Setting password for $RONINUSER
     chpasswd <<<"$RONINUSER:$PASSWORD"
 
-    # Save Linux user credentials for UI access (does not work on Armbian build)
+    # Save Linux user credentials for UI access
+    [ -f "/home/${RONINUSER}/.config/RoninDojo/info.json" ] && rm -rf "/home/${RONINUSER}/.config/RoninDojo/info.json"
     mkdir -p /home/"${RONINUSER}"/.config/RoninDojo
     cat <<EOF >/home/"${RONINUSER}"/.config/RoninDojo/info.json
 {"user":[{"name":"${RONINUSER}","password":"${PASSWORD}"},{"name":"root","password":"${ROOTPASSWORD}"}]}
