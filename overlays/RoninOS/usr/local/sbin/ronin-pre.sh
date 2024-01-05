@@ -21,7 +21,8 @@ echo "$(ls -l /home)" # DEBUG ownership of home folder after Armbian build
 [ -f /home/ronindojo/.logs/presetup-complete ] && (echo "Pre-setup has already run."; exit 0;)
 
 echo "Enable passwordless sudo for $RONINUSER if not already"
-grep -q "${RONINUSER}.*NOPASSWD:ALL" /etc/sudoers || sed -i "/${RONINUSER}/s/ALL) ALL/ALL) NOPASSWD:ALL/" /etc/sudoers
+grep -q "${RONINUSER}    ALL=(ALL) ALL" /etc/sudoers || ( echo "${RONINUSER} didn't have sudo permissions."; sed -i "/${RONINUSER}/s/ALL) ALL/ALL) ALL/" /etc/sudoers )
+grep -q "${RONINUSER}    ALL=(ALL) ALL" /etc/sudoers && ( echo "Changing ${RONINUSER} sudo permissions to passwordless"; echo "${RONINUSER}    ALL=(ALL) NOPASSWD:ALL" | tee -a /etc/sudoers )
 
 # ronin-setup.service starts at the same time during boot-up, making sure it is disabled before the wait to avoid conflicts
 echo "Making sure the ronin-setup.service is disabled"
