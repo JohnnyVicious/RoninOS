@@ -82,9 +82,9 @@ _disable_ipv6() {
     # Apply sysctl changes to disable IPv6
     if [ ! -f /etc/sysctl.d/40-ipv6.conf ]; then
         echo "Disabling IPv6..."
-        echo -e "# Disable IPV6\nnet.ipv6.conf.all.disable_ipv6 = 1" | sudo tee /etc/sysctl.d/40-ipv6.conf >/dev/null
+        echo -e "# Disable IPV6\nnet.ipv6.conf.all.disable_ipv6 = 1" | tee /etc/sysctl.d/40-ipv6.conf >/dev/null
         # Reload sysctl configurations
-        sudo sysctl -p /etc/sysctl.d/40-ipv6.conf
+        sysctl -p /etc/sysctl.d/40-ipv6.conf
         [ -d /proc/sys/net/ipv6 ] && systemctl restart --quiet systemd-sysctl
     else
         echo "IPv6 already disabled."
@@ -104,7 +104,7 @@ echo "Unique hostname determined: $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; _set_troubleshooting_passwords; exit 1;)
 
-ip a | grep -q inet6 && echo "Error: IPv6 address found! $(ip a | grep -q inet6)"
+ip a | grep -q inet6 && echo "Error: IPv6 address found! $(ip a | grep inet6)"
 
 # Wait for other system services to complete
 sleep 75s
