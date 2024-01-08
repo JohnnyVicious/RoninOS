@@ -352,7 +352,7 @@ main(){
         net-tools htop unzip wget ufw rsync jq python3 python3-pip
         pipenv gdisk gcc curl apparmor ca-certificates gnupg libevent-dev netcat-openbsd make
 	zlib1g-dev libssl-dev make automake autoconf musl-dev coreutils gpg
- 	smartmontools
+ 	smartmontools gnupg2 software-properties-common apt-transport-https lsb-release
     )
 
     apt install -y lsb-release
