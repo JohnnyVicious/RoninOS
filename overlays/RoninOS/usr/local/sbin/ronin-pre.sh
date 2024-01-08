@@ -112,7 +112,7 @@ sleep 75s
 # Noticed the SSH service sometimes fails during boot-up, retry after sleep, maybe network init related?
 systemctl is-active --quiet ssh.service || (echo "SSH not started, trying to start..."; systemctl start ssh.service)
 
-grep -q "127.0.0.1 $(hostname)" /etc/hosts || echo "127.0.0.1 $(hostname)" | sudo tee -a /etc/hosts # Make hostname resolvable to loopback address
+grep -q "127.0.0.1 $(hostname)" /etc/hosts || echo "127.0.0.1 $(hostname)" | tee -a /etc/hosts # Make hostname resolvable to loopback address
 
 echo "Add user $RONINUSER to the docker group for sudo-less access to commands"
 usermod -aG docker "$RONINUSER"
