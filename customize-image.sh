@@ -173,10 +173,9 @@ _prep_install(){
 	echo "Package: nodejs" | tee -a /etc/apt/preferences.d/preferences
         echo "Pin: origin deb.nodesource.com" | tee -a /etc/apt/preferences.d/preferences
         echo "Pin-Priority: 1001" | tee -a /etc/apt/preferences.d/preferences
-        apt update && apt install -y --no-install-recommends nodejs
-        apt-mark hold nodejs
+        apt update && apt install -y --no-install-recommends nodejs        
     fi
-    
+    apt-mark hold nodejs    
     apt-get install -y npm
 
     echo "Installing Docker on $DISTRO release $RELEASE"
