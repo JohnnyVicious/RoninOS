@@ -45,7 +45,7 @@ echo "Continue only if you can access the service user's home folder"
 cd "$HOME" || exit 1;
 
 # Verifying root password from info.json
-ROOTPASSWORD_STORED=$(jq -r '.user[] | select(.name=="root") | .password' /home/"${RONINUSER}"/.config/RoninDojo/info.json)
+ROOTPASSWORD_STORED=$(jq -r '.user[] | select(.name=="root") | .password' /home/"${USER}"/.config/RoninDojo/info.json)
 # Attempt a command with the root password
 echo "$ROOTPASSWORD_STORED" | sudo -S ls /root >/dev/null 2>&1
 if [ $? -eq 0 ]; then
