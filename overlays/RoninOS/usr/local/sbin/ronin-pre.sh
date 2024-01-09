@@ -46,17 +46,17 @@ _is_hostname_resolvable() {
     elif [ -z "$resolved_ip" ]; then
         # Case 2: Hostname is not resolvable
         echo "$1 is not resolvable"
-        return 2
+        return 0
     else
         # Check if the resolved IP is one of the machine's own IP addresses
         if echo "$machine_ips" | grep -q -w "$resolved_ip"; then
             # Case 3: Hostname resolves to machine's own IP
             echo "$1 is resolvable to the machine's own IP address"
-            return 0
+            return 1
         else
             # Case 4: Hostname is resolvable to a non-loopback, non-own IP address
             echo "$1 is resolvable to a non-loopback, non-own IP address"
-            return 0
+            return 1
         fi
     fi
 }
