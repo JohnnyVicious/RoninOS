@@ -11,7 +11,7 @@ _check_npm_module() {
 }
 
 _set_troubleshooting_passwords() {
-    echo "Resetting psswords of $USER to Ronindojo369 for troubleshooting via SSH."
+    echo "Resetting passwords of $USER to Ronindojo369 for troubleshooting via SSH."
     sudo chpasswd <<<"$USER:Ronindojo369" 
 }
 
