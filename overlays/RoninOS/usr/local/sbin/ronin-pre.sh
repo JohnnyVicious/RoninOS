@@ -31,20 +31,26 @@ systemctl is-enabled --quiet ronin-setup.service && (echo "ronin-setup.service w
 echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NEWHOSTNAME or an incremented variation..."
 # Function to check if a hostname is resolvable and not just pointing to 127.0.0.1
 _is_hostname_resolvable() {
-    # Use nslookup to check if the hostname resolves to a non-loopback address
+    # Use nslookup to check if the hostname resolves to an IP address
     local resolved_ip
-    resolved_ip=$(nslookup "$1" 2>/dev/null | grep -v "127.0.0.1" | grep 'Address' | awk '{print $2}' | tail -n1)
-    
-    if [ -z "$resolved_ip" ] || [ "$resolved_ip" = "127.0.0.1" ]; then
-        echo "$1 resolvable to loopback."
-        return 1 # Not resolvable or resolves to loopback
+    resolved_ip=$(nslookup "$1" 2>/dev/null | grep 'Address' | awk '{print $2}' | tail -n1)
+
+    if [ "$resolved_ip" = "127.0.0.1" ]; then
+        # Case 1: Hostname is resolvable to loopback
+        echo "$1 is resolvable to loopback"
+        return 1
+    elif [ -z "$resolved_ip" ]; then
+        # Case 2: Hostname is not resolvable
+        echo "$1 is not resolvable"
+        return 2
     else
-        echo "$1 resolvable to non-loopback."
-        return 0 # Resolvable to a non-loopback address
+        # Case 3: Hostname is resolvable to a non-loopback address
+        echo "$1 is resolvable to a non-loopback address"
+        return 0
     fi
 }
 
-# Check if the initial hostname resolves to a non-loopback address
+# Check if the initial hostname already exists on the network
 if _is_hostname_resolvable "$NEWHOSTNAME"; then
     # Find a unique hostname
     suffix=0
