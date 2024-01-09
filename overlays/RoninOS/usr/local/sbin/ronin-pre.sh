@@ -39,6 +39,7 @@ _is_hostname_resolvable() {
         echo "$1 resolvable to loopback."
         return 1 # Not resolvable or resolves to loopback
     else
+        echo "$1 resolvable to non-loopback."
         return 0 # Resolvable to a non-loopback address
     fi
 }
@@ -56,6 +57,7 @@ if _is_hostname_resolvable "$NEWHOSTNAME"; then
             exit 1
         fi
         NEWHOSTNAME="${original_hostname}$(printf "%02d" $suffix)"
+        echo "Checking hostname ${NEWHOSTNAME}"
     done
 else
     echo "Current hostname '$NEWHOSTNAME' is not resolvable or resolves to 127.0.0.1. Keeping it unchanged."
