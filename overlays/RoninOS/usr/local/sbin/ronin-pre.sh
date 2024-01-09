@@ -10,7 +10,7 @@ NEWHOSTNAME="RoninDojo"
 RONINUSER="ronindojo"
 
 _set_troubleshooting_passwords() {
-    echo "Resetting psswords of $RONINUSER to Ronindojo369 for troubleshooting via SSH."
+    echo "Resetting passwords of $RONINUSER to Ronindojo369 for troubleshooting via SSH."
     chpasswd <<<"$RONINUSER:Ronindojo369" 
 }
 
