@@ -35,6 +35,10 @@ _is_hostname_resolvable() {
     local resolved_ip
     resolved_ip=$(nslookup "$1" 2>/dev/null | grep 'Address' | awk '{print $2}' | tail -n1)
 
+    # Get the current machine's IP addresses (excluding loopback)
+    local machine_ips
+    machine_ips=$(hostname -I | tr ' ' '\n')
+
     if [ "$resolved_ip" = "127.0.0.1" ]; then
         # Case 1: Hostname is resolvable to loopback
         echo "$1 is resolvable to loopback"
@@ -44,9 +48,16 @@ _is_hostname_resolvable() {
         echo "$1 is not resolvable"
         return 2
     else
-        # Case 3: Hostname is resolvable to a non-loopback address
-        echo "$1 is resolvable to a non-loopback address"
-        return 0
+        # Check if the resolved IP is one of the machine's own IP addresses
+        if echo "$machine_ips" | grep -q "$resolved_ip"; then
+            # Case 3: Hostname resolves to machine's own IP
+            echo "$1 is resolvable to the machine's own IP address"
+            return 0
+        else
+            # Case 4: Hostname is resolvable to a non-loopback, non-own IP address
+            echo "$1 is resolvable to a non-loopback, non-own IP address"
+            return 0
+        fi
     fi
 }
 
