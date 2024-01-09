@@ -141,7 +141,7 @@ fi
 
 
 echo "Unique hostname determined: $NEWHOSTNAME"
-[ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME" && _update_hosts_file "${NEWHOSTNAME}";) && shutdown -r now
+[ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; _update_hosts_file "${NEWHOSTNAME}" && hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; _set_troubleshooting_passwords; exit 1;)
 
 ip a | grep -q inet6 && echo "Error: IPv6 address found! $(ip a | grep inet6)"
