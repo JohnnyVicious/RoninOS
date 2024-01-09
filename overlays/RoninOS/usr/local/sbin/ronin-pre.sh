@@ -31,9 +31,9 @@ systemctl is-enabled --quiet ronin-setup.service && (echo "ronin-setup.service w
 echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NEWHOSTNAME or an incremented variation..."
 # Function to check if a hostname is resolvable and not just pointing to 127.0.0.1
 _is_hostname_resolvable() {
-    # Use nslookup to check if the hostname resolves to an IP address
+    # Use nslookup to check if the hostname resolves to an IP address and extract the IP address
     local resolved_ip
-    resolved_ip=$(nslookup "$1" 2>/dev/null | grep 'Address' | awk '{print $2}' | tail -n1)
+    resolved_ip=$(nslookup "$1" 2>/dev/null | grep 'Address: ' | tail -n 1 | awk '{print $2}')
 
     # Get the current machine's IP addresses (excluding loopback)
     local machine_ips
@@ -49,7 +49,7 @@ _is_hostname_resolvable() {
         return 2
     else
         # Check if the resolved IP is one of the machine's own IP addresses
-        if echo "$machine_ips" | grep -q "$resolved_ip"; then
+        if echo "$machine_ips" | grep -q -w "$resolved_ip"; then
             # Case 3: Hostname resolves to machine's own IP
             echo "$1 is resolvable to the machine's own IP address"
             return 0
