@@ -321,14 +321,20 @@ _check_service_file() {
     local unit_path
     unit_path=$(_get_systemd_unit_path)
 
-    # Check each path in the unit path for the service file
-    IFS=':' read -ra paths <<< "$unit_path"
+    # Convert space-separated string into an array
+    IFS=' ' read -ra paths <<< "$unit_path"
+
+    # Check each path in the array for the service file
     for path in "${paths[@]}"; do
         if [ -f "${path}/${service_file}" ]; then
+            echo "Service file found at ${path}/${service_file}"
             return 0 # Success, file found
+        else
+            echo "Checking path, service file not found: ${path}"
         fi
     done
 
+    echo "Service file ${service_file} not found!"
     return 1 # Failure, file not found
 }
 
