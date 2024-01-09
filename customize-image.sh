@@ -143,12 +143,13 @@ _service_checks(){
 
     if ! systemctl is-enabled ronin-setup.service; then
         # Changed: service will get enabled after the ronin-pre.service ran succesfully
-	systemctl disable ronin-setup.service
+	systemctl enable ronin-setup.service
     fi
 
     if ! systemctl is-enabled ronin-post.service; then
         systemctl enable ronin-post.service
     fi
+    systemctl daemon-reload
 }
 
 _prep_install(){
