@@ -61,25 +61,6 @@ _is_hostname_resolvable() {
     fi
 }
 
-# Check if the initial hostname already exists on the network
-if _is_hostname_resolvable "$NEWHOSTNAME"; then
-    # Find a unique hostname
-    suffix=0
-    original_hostname=$NEWHOSTNAME
-    while _is_hostname_resolvable "$NEWHOSTNAME"; do
-        ((suffix++))
-        if [[ $suffix -gt 99 ]]; then
-            echo "Error: Reached suffix limit without finding a unique hostname."
-            _set_troubleshooting_passwords
-            exit 1
-        fi
-        NEWHOSTNAME="${original_hostname}$(printf "%02d" $suffix)"
-        echo "Checking hostname ${NEWHOSTNAME}"
-    done
-else
-    echo "Current hostname '$NEWHOSTNAME' is not resolvable or resolves to 127.0.0.1. Keeping it unchanged."
-fi
-
 # Disable ipv6
 _check_sysctl_availability() {
     # Check if sysctl command exists
@@ -138,6 +119,26 @@ else
     _set_troubleshooting_passwords
     exit 1
 fi
+
+# Check if the initial hostname already exists on the network
+if _is_hostname_resolvable "$NEWHOSTNAME"; then
+    # Find a unique hostname
+    suffix=0
+    original_hostname=$NEWHOSTNAME
+    while _is_hostname_resolvable "$NEWHOSTNAME"; do
+        ((suffix++))
+        if [[ $suffix -gt 99 ]]; then
+            echo "Error: Reached suffix limit without finding a unique hostname."
+            _set_troubleshooting_passwords
+            exit 1
+        fi
+        NEWHOSTNAME="${original_hostname}$(printf "%02d" $suffix)"
+        echo "Checking hostname ${NEWHOSTNAME}"
+    done
+else
+    echo "Current hostname '$NEWHOSTNAME' is not resolvable or resolves to own IP address. Keeping it unchanged."
+fi
+
 
 echo "Unique hostname determined: $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME" && _update_hosts_file "${NEWHOSTNAME}";) && shutdown -r now
