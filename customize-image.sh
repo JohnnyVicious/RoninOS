@@ -321,8 +321,12 @@ _check_service_file() {
     local unit_path
     unit_path=$(_get_systemd_unit_path)
 
-    # Convert space-separated string into an array
-    IFS=' ' read -ra paths <<< "$unit_path"
+    # Convert output string into an array	
+    if [[ "$unit_path" == *:* ]]; then
+        IFS=':' read -ra paths <<< "$unit_path"
+    else
+        IFS=' ' read -ra paths <<< "$unit_path"
+    fi
 
     # Check each path in the array for the service file
     for path in "${paths[@]}"; do
