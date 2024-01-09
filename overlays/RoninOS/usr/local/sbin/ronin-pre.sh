@@ -20,15 +20,6 @@ echo "$(ls -l /home)" # DEBUG ownership of home folder after Armbian build
 
 [ -f /home/ronindojo/.logs/presetup-complete ] && (echo "Pre-setup has already run."; exit 0;)
 
-echo "Enable passwordless sudo for $RONINUSER if not already"
-grep -q "${RONINUSER}    ALL=(ALL) ALL" /etc/sudoers || ( echo "${RONINUSER} didn't have sudo permissions."; sed -i "/${RONINUSER}/s/ALL) ALL/ALL) ALL/" /etc/sudoers )
-grep -q "${RONINUSER}    ALL=(ALL) ALL" /etc/sudoers && ( echo "Changing ${RONINUSER} sudo permissions to passwordless"; echo "${RONINUSER}    ALL=(ALL) NOPASSWD:ALL" | tee -a /etc/sudoers )
-
-# ronin-setup.service starts at the same time during boot-up, making sure it is disabled before the wait to avoid conflicts
-echo "Making sure the ronin-setup.service is disabled"
-systemctl is-enabled --quiet ronin-setup.service && (echo "ronin-setup.service was still enabled, stopping and disabling..."; systemctl disable --now ronin-setup.service)
-
-echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NEWHOSTNAME or an incremented variation..."
 # Function to check if a hostname is resolvable and not just pointing to 127.0.0.1
 _is_hostname_resolvable() {
     # Use nslookup to check if the hostname resolves to an IP address and extract the IP address
@@ -120,6 +111,15 @@ else
     exit 1
 fi
 
+echo "Enable passwordless sudo for $RONINUSER if not already"
+grep -q "${RONINUSER}    ALL=(ALL) ALL" /etc/sudoers || ( echo "${RONINUSER} didn't have sudo permissions."; sed -i "/${RONINUSER}/s/ALL) ALL/ALL) ALL/" /etc/sudoers )
+grep -q "${RONINUSER}    ALL=(ALL) ALL" /etc/sudoers && ( echo "Changing ${RONINUSER} sudo permissions to passwordless"; echo "${RONINUSER}    ALL=(ALL) NOPASSWD:ALL" | tee -a /etc/sudoers )
+
+# ronin-setup.service starts at the same time during boot-up, making sure it is disabled before the wait to avoid conflicts
+echo "Making sure the ronin-setup.service is disabled"
+systemctl is-enabled --quiet ronin-setup.service && (echo "ronin-setup.service was still enabled, stopping and disabling..."; systemctl disable --now ronin-setup.service)
+
+echo "Check the hostname $(hostname) and reboot if it needs to be changed to $NEWHOSTNAME or an incremented variation..."
 # Check if the initial hostname already exists on the network
 if _is_hostname_resolvable "$NEWHOSTNAME"; then
     # Find a unique hostname
@@ -138,7 +138,6 @@ if _is_hostname_resolvable "$NEWHOSTNAME"; then
 else
     echo "Current hostname '$NEWHOSTNAME' is not resolvable or resolves to own IP address. Keeping it unchanged."
 fi
-
 
 echo "Unique hostname determined: $NEWHOSTNAME"
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; _update_hosts_file "${NEWHOSTNAME}" && hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
