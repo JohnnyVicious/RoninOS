@@ -110,6 +110,26 @@ _disable_ipv6() {
     fi
 }
 
+_update_hosts_file() {
+    local new_hostname="$1"
+    local old_hostname=$(hostname)
+
+    # Check if the user is root, necessary for changing /etc/hosts
+    if [ "$(id -u)" != "0" ]; then
+        echo "This script must be run as root."
+        return 1
+    fi
+
+    # Update /etc/hostname
+    echo "$new_hostname" > /etc/hostname
+    hostname "$new_hostname"
+
+    # Update /etc/hosts
+    sed -i "s/$old_hostname/$new_hostname/g" /etc/hosts
+
+    echo "Hostname updated to $new_hostname"
+}
+
 # Perform sysctl checks
 if _check_sysctl_availability; then
     _disable_ipv6
@@ -120,7 +140,7 @@ else
 fi
 
 echo "Unique hostname determined: $NEWHOSTNAME"
-[ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME";) && shutdown -r now
+[ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Changing hostname $(hostname) to $NEWHOSTNAME and rebooting"; hostnamectl set-hostname "$NEWHOSTNAME" && _update_hosts_file "${NEWHOSTNAME}";) && shutdown -r now
 [ "$(hostname)" != "$NEWHOSTNAME" ] && (echo "Hostname $(hostname) is still not $NEWHOSTNAME, exiting..."; _set_troubleshooting_passwords; exit 1;)
 
 ip a | grep -q inet6 && echo "Error: IPv6 address found! $(ip a | grep inet6)"
